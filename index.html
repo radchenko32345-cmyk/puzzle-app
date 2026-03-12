@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Пазл из фото</title>
+  <style>
+    :root {
+      --text: #f9fafb;
+      --muted: #cbd5e1;
+      --accent: #22c55e;
+      --accent2: #3b82f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #0f172a, #111827);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .app {
+      width: 100%;
+      max-width: 980px;
+      background: rgba(17, 24, 39, 0.92);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+    p {
+      color: var(--muted);
+      margin-top: 0;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+    .btn, label.btn {
+      background: var(--accent2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+    .btn.save { background: var(--accent); }
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+    input[type="file"] { display: none; }
+    .preview-wrap {
+      background: #0b1220;
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .stage {
+      position: relative;
+      width: 100%;
+      min-height: 260px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: auto;
+    }
+    canvas {
+      display: none;
+      max-width: 100%;
+      height: auto;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      background: #0f172a;
+    }
+    .placeholder {
+      width: 100%;
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 20px;
+      border: 2px dashed rgba(255,255,255,0.15);
+      border-radius: 14px;
+    }
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.06);
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+    .footer {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Пазл из фото</h1>
+    <p>Выберите фото, поверх него появится классическая форма пазла. Потом нажмите «Сохранить пазл».</p>
+
+    <div class="controls">
+      <label class="btn">
+        Выбрать фото
+        <input id="fileInput" type="file" accept="image/*" />
+      </label>
+
+      <div class="range-wrap">
+        <span>Кусочки:</span>
+        <input id="gridRange" type="range" min="2" max="8" value="4" />
+        <strong id="gridValue">4 × 4</strong>
+      </div>
+
+      <button id="shuffleBtn" class="btn" disabled>Перемешать</button>
+      <button id="saveBtn" class="btn save" disabled>Сохранить пазл</button>
+    </div>
+
+    <div class="preview-wrap">
+      <div class="stage">
+        <div class="placeholder" id="placeholder">Пока фото не выбрано. Нажмите «Выбрать фото».</div>
+        <canvas id="canvas"></canvas>
+      </div>
+    </div>
+
+    <div class="footer">Это HTTP-версия: можно открыть как обычную веб-страницу на телефоне или ПК.</div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const saveBtn = document.getElementById('saveBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const placeholder = document.getElementById('placeholder');
+    const gridRange = document.getElementById('gridRange');
+    const gridValue = document.getElementById('gridValue');
+
+    let currentImage = null;
+    let currentVerticalOffsets = [];
+    let currentHorizontalOffsets = [];
+    let currentVerticalTabs = [];
+    let currentHorizontalTabs = [];
+
+    function fitSize(width, height, maxSide = 1100) {
+      const scale = Math.min(1, maxSide / Math.max(width, height));
+      return {
+        width: Math.max(1, Math.round(width * scale)),
+        height: Math.max(1, Math.round(height * scale))
+      };
+    }
+
+    function initializeSeamOffsets() {
+      const pieces = Number(gridRange.value);
+      currentVerticalOffsets = Array.from({ length: Math.max(0, pieces - 1) }, () => 50);
+      currentHorizontalOffsets = Array.from({ length: Math.max(0, pieces - 1) }, () => 50);
+      currentVerticalTabs = Array.from(
+        { length: pieces },
+        (_, row) => Array.from({ length: Math.max(0, pieces - 1) }, (_, col) => ((row + col) % 2 === 0 ? 1 : -1))
+      );
+      currentHorizontalTabs = Array.from(
+        { length: Math.max(0, pieces - 1) },
+        (_, row) => Array.from({ length: pieces }, (_, col) => ((row + col) % 2 === 0 ? -1 : 1))
+      );
+    }
+
+    function randomizeTabs() {
+      const pieces = Number(gridRange.value);
+      currentVerticalTabs = Array.from(
+        { length: pieces },
+        () => Array.from({ length: Math.max(0, pieces - 1) }, () => (Math.random() > 0.5 ? 1 : -1))
+      );
+      currentHorizontalTabs = Array.from(
+        { length: Math.max(0, pieces - 1) },
+        () => Array.from({ length: pieces }, () => (Math.random() > 0.5 ? 1 : -1))
+      );
+    }
+
+    function updateGridLabel() {
+      const n = Number(gridRange.value);
+      gridValue.textContent = `${n} × ${n}`;
+    }
+
+    function drawHorizontalSeam(y, col, dir, offsetPercent, cellW, radius) {
+      const x0 = col * cellW;
+      const cx = x0 + cellW * (offsetPercent / 100);
+
+      ctx.beginPath();
+      ctx.moveTo(x0, y);
+      ctx.lineTo(cx - radius, y);
+      ctx.arc(cx, y, radius, Math.PI, 0, dir < 0);
+      ctx.lineTo(x0 + cellW, y);
+      ctx.stroke();
+    }
+
+    function drawVerticalSeam(x, row, dir, offsetPercent, cellH, radius) {
+      const y0 = row * cellH;
+      const cy = y0 + cellH * (offsetPercent / 100);
+
+      ctx.beginPath();
+      ctx.moveTo(x, y0);
+      ctx.lineTo(x, cy - radius);
+      ctx.arc(x, cy, radius, -Math.PI / 2, Math.PI / 2, dir < 0);
+      ctx.lineTo(x, y0 + cellH);
+      ctx.stroke();
+    }
+
+    function drawPuzzle() {
+      if (!currentImage) return;
+
+      const pieces = Number(gridRange.value);
+      const fitted = fitSize(currentImage.naturalWidth || currentImage.width, currentImage.naturalHeight || currentImage.height);
+      const width = fitted.width;
+      const height = fitted.height;
+      const cellW = width / pieces;
+      const cellH = height / pieces;
+      const radius = Math.min(cellW, cellH) * 0.14;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      ctx.clearRect(0, 0, width, height);
+      ctx.drawImage(currentImage, 0, 0, width, height);
+
+      
+
+      ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.beginPath();
+      ctx.rect(0, 0, width, height);
+      ctx.stroke();
+
+      for (let row = 0; row < pieces; row++) {
+        for (let col = 1; col < pieces; col++) {
+          drawVerticalSeam(col * cellW, row, currentVerticalTabs[row][col - 1], currentVerticalOffsets[col - 1] ?? 50, cellH, radius);
+        }
+      }
+
+      for (let row = 1; row < pieces; row++) {
+        for (let col = 0; col < pieces; col++) {
+          drawHorizontalSeam(row * cellH, col, currentHorizontalTabs[row - 1][col], currentHorizontalOffsets[row - 1] ?? 50, cellW, radius);
+        }
+      }
+
+      canvas.style.display = 'block';
+      placeholder.style.display = 'none';
+      saveBtn.disabled = false;
+      shuffleBtn.disabled = false;
+    }
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          currentImage = img;
+          initializeSeamOffsets();
+          updateGridLabel();
+          drawPuzzle();
+        };
+        img.onerror = () => {
+          currentImage = null;
+          placeholder.textContent = 'Не удалось загрузить изображение';
+          placeholder.style.display = 'block';
+          canvas.style.display = 'none';
+          saveBtn.disabled = true;
+          shuffleBtn.disabled = true;
+        };
+        img.src = String(reader.result);
+      };
+
+      reader.onerror = () => {
+        currentImage = null;
+        placeholder.textContent = 'Ошибка чтения файла';
+        placeholder.style.display = 'block';
+        canvas.style.display = 'none';
+        saveBtn.disabled = true;
+        shuffleBtn.disabled = true;
+      };
+
+      reader.readAsDataURL(file);
+    });
+
+    gridRange.addEventListener('input', () => {
+      updateGridLabel();
+      initializeSeamOffsets();
+      drawPuzzle();
+    });
+
+    shuffleBtn.addEventListener('click', () => {
+      if (!currentImage) return;
+      randomizeTabs();
+      drawPuzzle();
+    });
+
+    saveBtn.addEventListener('click', () => {
+      if (!currentImage) return;
+      const link = document.createElement('a');
+      link.download = 'puzzle.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    updateGridLabel();
+    initializeSeamOffsets();
+  </script>
+</body>
+</html>
