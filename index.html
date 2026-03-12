@@ -10,8 +10,11 @@
       --muted: #cbd5e1;
       --accent: #22c55e;
       --accent2: #3b82f6;
+      --panel: rgba(17, 24, 39, 0.92);
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -22,22 +25,26 @@
       justify-content: center;
       padding: 20px;
     }
+
     .app {
       width: 100%;
-      max-width: 980px;
-      background: rgba(17, 24, 39, 0.92);
+      max-width: 1100px;
+      background: var(--panel);
       border-radius: 18px;
       padding: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
     }
+
     h1 {
       margin: 0 0 8px;
       font-size: 28px;
     }
+
     p {
       color: var(--muted);
       margin-top: 0;
     }
+
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -45,7 +52,9 @@
       margin-bottom: 16px;
       align-items: center;
     }
-    .btn, label.btn {
+
+    .btn,
+    label.btn {
       background: var(--accent2);
       color: white;
       border: none;
@@ -57,18 +66,28 @@
       align-items: center;
       justify-content: center;
       text-decoration: none;
+      min-height: 46px;
     }
-    .btn.save { background: var(--accent); }
+
+    .btn.save {
+      background: var(--accent);
+    }
+
     .btn:disabled {
       opacity: 0.55;
       cursor: not-allowed;
     }
-    input[type="file"] { display: none; }
+
+    input[type="file"] {
+      display: none;
+    }
+
     .preview-wrap {
       background: #0b1220;
       border-radius: 16px;
       padding: 16px;
     }
+
     .stage {
       position: relative;
       width: 100%;
@@ -78,30 +97,48 @@
       align-items: center;
       overflow: auto;
     }
+
     canvas {
       display: none;
       max-width: 100%;
       height: auto;
       border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       background: #0f172a;
     }
+
     .placeholder {
       width: 100%;
       text-align: center;
       color: var(--muted);
       padding: 40px 20px;
-      border: 2px dashed rgba(255,255,255,0.15);
+      border: 2px dashed rgba(255, 255, 255, 0.15);
       border-radius: 14px;
     }
+
     .range-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
-      background: rgba(255,255,255,0.06);
+      background: rgba(255, 255, 255, 0.06);
       padding: 10px 12px;
       border-radius: 12px;
+      min-height: 46px;
     }
+
+    .range-wrap input[type="range"] {
+      width: 140px;
+    }
+
+    .range-wrap input[type="color"] {
+      width: 42px;
+      height: 32px;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
     .footer {
       margin-top: 14px;
       color: var(--muted);
@@ -112,13 +149,11 @@
 <body>
   <div class="app">
     <h1>Пазл из фото</h1>
-    <p>Выберите фото, настройте количество кусочков по горизонтали и вертикали, потом нажмите «Сохранить пазл».</p>
+    <p>Выберите фото, настройте количество кусочков и внешний вид контура, затем сохраните результат.</p>
 
     <div class="controls">
-      <label class="btn">
-        Выбрать фото
-        <input id="fileInput" type="file" accept="image/*" />
-      </label>
+      <label class="btn" for="fileInput">Выбрать фото</label>
+      <input id="fileInput" type="file" accept="image/*" />
 
       <div class="range-wrap">
         <span>По горизонтали:</span>
@@ -132,6 +167,18 @@
         <strong id="rowsValue">4</strong>
       </div>
 
+      <div class="range-wrap">
+        <span>Толщина контура:</span>
+        <input id="strokeWidthRange" type="range" min="1" max="6" value="2.2" step="0.2" />
+        <strong id="strokeWidthValue">2.2</strong>
+      </div>
+
+      <div class="range-wrap">
+        <span>Цвет контура:</span>
+        <input id="strokeColorInput" type="color" value="#000000" />
+        <strong id="strokeColorValue">#000000</strong>
+      </div>
+
       <button id="shuffleBtn" class="btn" disabled>Перемешать</button>
       <button id="saveBtn" class="btn save" disabled>Сохранить пазл</button>
     </div>
@@ -143,7 +190,7 @@
       </div>
     </div>
 
-    <div class="footer">Это HTTP-версия: можно открыть как обычную веб-страницу на телефоне или ПК.</div>
+    <div class="footer">Это HTTP-версия: её можно открыть как обычную веб-страницу на телефоне или ПК.</div>
   </div>
 
   <script>
@@ -157,6 +204,10 @@
     const rowsRange = document.getElementById('rowsRange');
     const colsValue = document.getElementById('colsValue');
     const rowsValue = document.getElementById('rowsValue');
+    const strokeWidthRange = document.getElementById('strokeWidthRange');
+    const strokeWidthValue = document.getElementById('strokeWidthValue');
+    const strokeColorInput = document.getElementById('strokeColorInput');
+    const strokeColorValue = document.getElementById('strokeColorValue');
 
     let currentImage = null;
     let currentVerticalOffsets = [];
@@ -178,6 +229,13 @@
 
     function getRows() {
       return Number(rowsRange.value);
+    }
+
+    function updateLabels() {
+      colsValue.textContent = String(getCols());
+      rowsValue.textContent = String(getRows());
+      strokeWidthValue.textContent = String(strokeWidthRange.value);
+      strokeColorValue.textContent = strokeColorInput.value.toUpperCase();
     }
 
     function initializePuzzleState() {
@@ -211,11 +269,6 @@
         { length: Math.max(0, rows - 1) },
         () => Array.from({ length: cols }, () => (Math.random() > 0.5 ? 1 : -1))
       );
-    }
-
-    function updateGridLabel() {
-      colsValue.textContent = String(getCols());
-      rowsValue.textContent = String(getRows());
     }
 
     function drawHorizontalSeam(y, col, dir, offsetPercent, cellW, radius) {
@@ -260,8 +313,8 @@
       ctx.clearRect(0, 0, width, height);
       ctx.drawImage(currentImage, 0, 0, width, height);
 
-      ctx.strokeStyle = 'rgba(0,0,0,0.95)';
-      ctx.lineWidth = 2.2;
+      ctx.strokeStyle = strokeColorInput.value;
+      ctx.lineWidth = Number(strokeWidthRange.value);
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
@@ -269,15 +322,29 @@
       ctx.rect(0, 0, width, height);
       ctx.stroke();
 
-      for (let row = 0; row < rows; row++) {
-        for (let col = 1; col < cols; col++) {
-          drawVerticalSeam(col * cellW, row, currentVerticalTabs[row][col - 1], currentVerticalOffsets[col - 1] ?? 50, cellH, radius);
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 1; col < cols; col += 1) {
+          drawVerticalSeam(
+            col * cellW,
+            row,
+            currentVerticalTabs[row][col - 1],
+            currentVerticalOffsets[col - 1] ?? 50,
+            cellH,
+            radius
+          );
         }
       }
 
-      for (let row = 1; row < rows; row++) {
-        for (let col = 0; col < cols; col++) {
-          drawHorizontalSeam(row * cellH, col, currentHorizontalTabs[row - 1][col], currentHorizontalOffsets[row - 1] ?? 50, cellW, radius);
+      for (let row = 1; row < rows; row += 1) {
+        for (let col = 0; col < cols; col += 1) {
+          drawHorizontalSeam(
+            row * cellH,
+            col,
+            currentHorizontalTabs[row - 1][col],
+            currentHorizontalOffsets[row - 1] ?? 50,
+            cellW,
+            radius
+          );
         }
       }
 
@@ -287,52 +354,68 @@
       shuffleBtn.disabled = false;
     }
 
+    function setError(message) {
+      currentImage = null;
+      placeholder.textContent = message;
+      placeholder.style.display = 'block';
+      canvas.style.display = 'none';
+      saveBtn.disabled = true;
+      shuffleBtn.disabled = true;
+    }
+
     fileInput.addEventListener('change', (event) => {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
       const reader = new FileReader();
 
-      reader.onload = () => {
+      reader.onload = (loadEvent) => {
+        const src = loadEvent.target && loadEvent.target.result;
+        if (!src) {
+          setError('Не удалось прочитать изображение');
+          return;
+        }
+
         const img = new Image();
         img.onload = () => {
           currentImage = img;
           initializePuzzleState();
-          updateGridLabel();
+          updateLabels();
           drawPuzzle();
         };
         img.onerror = () => {
-          currentImage = null;
-          placeholder.textContent = 'Не удалось загрузить изображение';
-          placeholder.style.display = 'block';
-          canvas.style.display = 'none';
-          saveBtn.disabled = true;
-          shuffleBtn.disabled = true;
+          setError('Не удалось загрузить изображение');
         };
-        img.src = String(reader.result);
+        img.src = src;
       };
 
       reader.onerror = () => {
-        currentImage = null;
-        placeholder.textContent = 'Ошибка чтения файла';
-        placeholder.style.display = 'block';
-        canvas.style.display = 'none';
-        saveBtn.disabled = true;
-        shuffleBtn.disabled = true;
+        setError('Ошибка чтения файла');
       };
 
       reader.readAsDataURL(file);
+      fileInput.value = '';
     });
 
     colsRange.addEventListener('input', () => {
-      updateGridLabel();
+      updateLabels();
       initializePuzzleState();
       drawPuzzle();
     });
 
     rowsRange.addEventListener('input', () => {
-      updateGridLabel();
+      updateLabels();
       initializePuzzleState();
+      drawPuzzle();
+    });
+
+    strokeWidthRange.addEventListener('input', () => {
+      updateLabels();
+      drawPuzzle();
+    });
+
+    strokeColorInput.addEventListener('input', () => {
+      updateLabels();
       drawPuzzle();
     });
 
@@ -350,7 +433,7 @@
       link.click();
     });
 
-    updateGridLabel();
+    updateLabels();
     initializePuzzleState();
   </script>
 </body>
