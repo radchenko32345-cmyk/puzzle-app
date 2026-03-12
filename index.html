@@ -112,7 +112,7 @@
 <body>
   <div class="app">
     <h1>Пазл из фото</h1>
-    <p>Выберите фото, поверх него появится классическая форма пазла. Потом нажмите «Сохранить пазл».</p>
+    <p>Выберите фото, настройте количество кусочков по горизонтали и вертикали, потом нажмите «Сохранить пазл».</p>
 
     <div class="controls">
       <label class="btn">
@@ -121,9 +121,15 @@
       </label>
 
       <div class="range-wrap">
-        <span>Кусочки:</span>
-        <input id="gridRange" type="range" min="2" max="8" value="4" />
-        <strong id="gridValue">4 × 4</strong>
+        <span>По горизонтали:</span>
+        <input id="colsRange" type="range" min="2" max="8" value="4" />
+        <strong id="colsValue">4</strong>
+      </div>
+
+      <div class="range-wrap">
+        <span>По вертикали:</span>
+        <input id="rowsRange" type="range" min="2" max="8" value="4" />
+        <strong id="rowsValue">4</strong>
       </div>
 
       <button id="shuffleBtn" class="btn" disabled>Перемешать</button>
@@ -147,8 +153,10 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const placeholder = document.getElementById('placeholder');
-    const gridRange = document.getElementById('gridRange');
-    const gridValue = document.getElementById('gridValue');
+    const colsRange = document.getElementById('colsRange');
+    const rowsRange = document.getElementById('rowsRange');
+    const colsValue = document.getElementById('colsValue');
+    const rowsValue = document.getElementById('rowsValue');
 
     let currentImage = null;
     let currentVerticalOffsets = [];
@@ -164,35 +172,50 @@
       };
     }
 
-    function initializeSeamOffsets() {
-      const pieces = Number(gridRange.value);
-      currentVerticalOffsets = Array.from({ length: Math.max(0, pieces - 1) }, () => 50);
-      currentHorizontalOffsets = Array.from({ length: Math.max(0, pieces - 1) }, () => 50);
+    function getCols() {
+      return Number(colsRange.value);
+    }
+
+    function getRows() {
+      return Number(rowsRange.value);
+    }
+
+    function initializePuzzleState() {
+      const cols = getCols();
+      const rows = getRows();
+
+      currentVerticalOffsets = Array.from({ length: Math.max(0, cols - 1) }, () => 50);
+      currentHorizontalOffsets = Array.from({ length: Math.max(0, rows - 1) }, () => 50);
+
       currentVerticalTabs = Array.from(
-        { length: pieces },
-        (_, row) => Array.from({ length: Math.max(0, pieces - 1) }, (_, col) => ((row + col) % 2 === 0 ? 1 : -1))
+        { length: rows },
+        (_, row) => Array.from({ length: Math.max(0, cols - 1) }, (_, col) => ((row + col) % 2 === 0 ? 1 : -1))
       );
+
       currentHorizontalTabs = Array.from(
-        { length: Math.max(0, pieces - 1) },
-        (_, row) => Array.from({ length: pieces }, (_, col) => ((row + col) % 2 === 0 ? -1 : 1))
+        { length: Math.max(0, rows - 1) },
+        (_, row) => Array.from({ length: cols }, (_, col) => ((row + col) % 2 === 0 ? -1 : 1))
       );
     }
 
     function randomizeTabs() {
-      const pieces = Number(gridRange.value);
+      const cols = getCols();
+      const rows = getRows();
+
       currentVerticalTabs = Array.from(
-        { length: pieces },
-        () => Array.from({ length: Math.max(0, pieces - 1) }, () => (Math.random() > 0.5 ? 1 : -1))
+        { length: rows },
+        () => Array.from({ length: Math.max(0, cols - 1) }, () => (Math.random() > 0.5 ? 1 : -1))
       );
+
       currentHorizontalTabs = Array.from(
-        { length: Math.max(0, pieces - 1) },
-        () => Array.from({ length: pieces }, () => (Math.random() > 0.5 ? 1 : -1))
+        { length: Math.max(0, rows - 1) },
+        () => Array.from({ length: cols }, () => (Math.random() > 0.5 ? 1 : -1))
       );
     }
 
     function updateGridLabel() {
-      const n = Number(gridRange.value);
-      gridValue.textContent = `${n} × ${n}`;
+      colsValue.textContent = String(getCols());
+      rowsValue.textContent = String(getRows());
     }
 
     function drawHorizontalSeam(y, col, dir, offsetPercent, cellW, radius) {
@@ -222,12 +245,13 @@
     function drawPuzzle() {
       if (!currentImage) return;
 
-      const pieces = Number(gridRange.value);
+      const cols = getCols();
+      const rows = getRows();
       const fitted = fitSize(currentImage.naturalWidth || currentImage.width, currentImage.naturalHeight || currentImage.height);
       const width = fitted.width;
       const height = fitted.height;
-      const cellW = width / pieces;
-      const cellH = height / pieces;
+      const cellW = width / cols;
+      const cellH = height / rows;
       const radius = Math.min(cellW, cellH) * 0.14;
 
       canvas.width = width;
@@ -235,8 +259,6 @@
 
       ctx.clearRect(0, 0, width, height);
       ctx.drawImage(currentImage, 0, 0, width, height);
-
-      
 
       ctx.strokeStyle = 'rgba(0,0,0,0.95)';
       ctx.lineWidth = 2.2;
@@ -247,14 +269,14 @@
       ctx.rect(0, 0, width, height);
       ctx.stroke();
 
-      for (let row = 0; row < pieces; row++) {
-        for (let col = 1; col < pieces; col++) {
+      for (let row = 0; row < rows; row++) {
+        for (let col = 1; col < cols; col++) {
           drawVerticalSeam(col * cellW, row, currentVerticalTabs[row][col - 1], currentVerticalOffsets[col - 1] ?? 50, cellH, radius);
         }
       }
 
-      for (let row = 1; row < pieces; row++) {
-        for (let col = 0; col < pieces; col++) {
+      for (let row = 1; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
           drawHorizontalSeam(row * cellH, col, currentHorizontalTabs[row - 1][col], currentHorizontalOffsets[row - 1] ?? 50, cellW, radius);
         }
       }
@@ -275,7 +297,7 @@
         const img = new Image();
         img.onload = () => {
           currentImage = img;
-          initializeSeamOffsets();
+          initializePuzzleState();
           updateGridLabel();
           drawPuzzle();
         };
@@ -302,9 +324,15 @@
       reader.readAsDataURL(file);
     });
 
-    gridRange.addEventListener('input', () => {
+    colsRange.addEventListener('input', () => {
       updateGridLabel();
-      initializeSeamOffsets();
+      initializePuzzleState();
+      drawPuzzle();
+    });
+
+    rowsRange.addEventListener('input', () => {
+      updateGridLabel();
+      initializePuzzleState();
       drawPuzzle();
     });
 
@@ -323,7 +351,7 @@
     });
 
     updateGridLabel();
-    initializeSeamOffsets();
+    initializePuzzleState();
   </script>
 </body>
 </html>
