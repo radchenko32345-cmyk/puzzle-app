@@ -10,11 +10,10 @@
       --muted: #cbd5e1;
       --accent: #22c55e;
       --accent2: #3b82f6;
+      --accent3: #8b5cf6;
       --panel: rgba(17, 24, 39, 0.92);
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: Arial, sans-serif;
@@ -25,26 +24,22 @@
       justify-content: center;
       padding: 20px;
     }
-
     .app {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1120px;
       background: var(--panel);
       border-radius: 18px;
       padding: 20px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
     }
-
     h1 {
       margin: 0 0 8px;
       font-size: 28px;
     }
-
     p {
       color: var(--muted);
       margin-top: 0;
     }
-
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -52,9 +47,7 @@
       margin-bottom: 16px;
       align-items: center;
     }
-
-    .btn,
-    label.btn {
+    .btn, label.btn {
       background: var(--accent2);
       color: white;
       border: none;
@@ -68,26 +61,19 @@
       text-decoration: none;
       min-height: 46px;
     }
-
-    .btn.save {
-      background: var(--accent);
-    }
-
+    .btn.save { background: var(--accent); }
+    .btn.play { background: var(--accent3); }
     .btn:disabled {
       opacity: 0.55;
       cursor: not-allowed;
     }
-
-    input[type="file"] {
-      display: none;
-    }
-
+    input[type="file"] { display: none; }
     .preview-wrap {
       background: #0b1220;
       border-radius: 16px;
       padding: 16px;
+      margin-bottom: 16px;
     }
-
     .stage {
       position: relative;
       width: 100%;
@@ -97,8 +83,7 @@
       align-items: center;
       overflow: auto;
     }
-
-    canvas {
+    canvas.main-canvas {
       display: none;
       max-width: 100%;
       height: auto;
@@ -106,7 +91,6 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       background: #0f172a;
     }
-
     .placeholder {
       width: 100%;
       text-align: center;
@@ -115,7 +99,6 @@
       border: 2px dashed rgba(255, 255, 255, 0.15);
       border-radius: 14px;
     }
-
     .range-wrap {
       display: flex;
       align-items: center;
@@ -125,11 +108,7 @@
       border-radius: 12px;
       min-height: 46px;
     }
-
-    .range-wrap input[type="range"] {
-      width: 140px;
-    }
-
+    .range-wrap input[type="range"] { width: 140px; }
     .range-wrap input[type="color"] {
       width: 42px;
       height: 32px;
@@ -138,18 +117,153 @@
       background: transparent;
       cursor: pointer;
     }
-
-    .footer {
-      margin-top: 14px;
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .example-card {
+      padding: 0;
+      border: none;
+      background: #111827;
+      color: white;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      text-align: left;
+    }
+    .example-card img {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      display: block;
+    }
+    .example-card div { padding: 10px 12px; }
+    .footer-note {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.78);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 1000;
+    }
+    .modal.open { display: flex; }
+    .modal-content {
+      width: min(1240px, 96vw);
+      max-height: 92vh;
+      overflow: auto;
+      background: #0b1220;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .modal-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .play-layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) 460px;
+      gap: 16px;
+      align-items: start;
+    }
+    .board-wrap, .tray-wrap {
+      background: rgba(255,255,255,0.04);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .board-wrap h3, .tray-wrap h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+    .board-area {
+      position: relative;
+      min-height: 380px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .board-silhouette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.18;
+      background-size: cover;
+      background-position: center;
+      filter: grayscale(0.2);
+    }
+    .tray-area {
+      position: relative;
+      min-height: 420px;
+      max-height: 72vh;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      overflow: auto;
+      padding: 12px;
+    }
+    .piece {
+      display: block !important;
+      position: absolute;
+      touch-action: none;
+      cursor: grab;
+      user-select: none;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+    .piece.locked { cursor: default; }
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
       color: var(--muted);
       font-size: 14px;
+      flex-wrap: wrap;
+    }
+    .win-banner {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.35);
+      border-radius: 12px;
+      color: #dcfce7;
+      font-weight: 700;
+    }
+    @media (max-width: 920px) {
+      .play-layout { grid-template-columns: 1fr; }
+      .tray-wrap { order: -1; }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <h1>Пазл из фото</h1>
-    <p>Выберите фото, настройте количество кусочков и внешний вид контура, затем сохраните результат.</p>
+    <p>Выберите фото, настройте количество кусочков и внешний вид контура, затем сохраните результат или нажмите «Играть».</p>
 
     <div class="controls">
       <label class="btn" for="fileInput">Выбрать фото</label>
@@ -180,23 +294,79 @@
       </div>
 
       <button id="shuffleBtn" class="btn" disabled>Перемешать</button>
+      <button id="playBtn" class="btn play" disabled>Играть</button>
       <button id="saveBtn" class="btn save" disabled>Сохранить пазл</button>
     </div>
 
     <div class="preview-wrap">
-      <div class="stage">
-        <div class="placeholder" id="placeholder">Пока фото не выбрано. Нажмите «Выбрать фото».</div>
-        <canvas id="canvas"></canvas>
+      <div style="font-weight:700; margin-bottom:12px;">Примеры фотографий</div>
+      <div class="examples-grid">
+        <button class="example-card" data-label="Горы" data-src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80">
+          <img alt="Горы" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=60" />
+          <div>Горы</div>
+        </button>
+        <button class="example-card" data-label="Кот" data-src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=1200&q=80">
+          <img alt="Кот" src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=400&q=60" />
+          <div>Кот</div>
+        </button>
+        <button class="example-card" data-label="Город" data-src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80">
+          <img alt="Город" src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=60" />
+          <div>Город</div>
+        </button>
       </div>
     </div>
 
-    <div class="footer">Это HTTP-версия: её можно открыть как обычную веб-страницу на телефоне или ПК.</div>
+    <div class="preview-wrap">
+      <div class="stage">
+        <div class="placeholder" id="placeholder">Фото не выбрано. Нажмите «Выбрать фото».</div>
+        <canvas id="canvas" class="main-canvas"></canvas>
+      </div>
+    </div>
+
+    <div class="footer-note">
+      <div>Разработал ученик 10 "А" класса Радченко Максим</div>
+      <div>МКОУ Бутурлиновская СОШ</div>
+    </div>
+  </div>
+
+  <div id="playModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">Собери пазл</div>
+          <div class="modal-subtitle">Кусочки справа полностью синхронизированы с пазлом на основном изображении.</div>
+        </div>
+        <button id="closeModalBtn" class="btn">Закрыть</button>
+      </div>
+
+      <div class="play-layout">
+        <div class="board-wrap">
+          <h3>Поле сборки</h3>
+          <div id="boardArea" class="board-area">
+            <div id="boardSilhouette" class="board-silhouette"></div>
+          </div>
+        </div>
+
+        <div class="tray-wrap">
+          <h3>Кусочки</h3>
+          <div id="trayArea" class="tray-area"></div>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <div id="piecesStatus">Собрано: 0</div>
+        <button id="reshufflePlayBtn" class="btn">Перемешать снова</button>
+      </div>
+
+      <div id="winBanner" class="win-banner">Отлично! Пазл собран.</div>
+    </div>
   </div>
 
   <script>
     const fileInput = document.getElementById('fileInput');
     const saveBtn = document.getElementById('saveBtn');
     const shuffleBtn = document.getElementById('shuffleBtn');
+    const playBtn = document.getElementById('playBtn');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const placeholder = document.getElementById('placeholder');
@@ -208,12 +378,22 @@
     const strokeWidthValue = document.getElementById('strokeWidthValue');
     const strokeColorInput = document.getElementById('strokeColorInput');
     const strokeColorValue = document.getElementById('strokeColorValue');
+    const exampleCards = document.querySelectorAll('.example-card');
+
+    const playModal = document.getElementById('playModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const reshufflePlayBtn = document.getElementById('reshufflePlayBtn');
+    const boardArea = document.getElementById('boardArea');
+    const boardSilhouette = document.getElementById('boardSilhouette');
+    const trayArea = document.getElementById('trayArea');
+    const piecesStatus = document.getElementById('piecesStatus');
+    const winBanner = document.getElementById('winBanner');
 
     let currentImage = null;
-    let currentVerticalOffsets = [];
-    let currentHorizontalOffsets = [];
-    let currentVerticalTabs = [];
-    let currentHorizontalTabs = [];
+    let verticalTabs = [];
+    let horizontalTabs = [];
+    let playPieces = [];
+    let zCounter = 10;
 
     function fitSize(width, height, maxSide = 1100) {
       const scale = Math.min(1, maxSide / Math.max(width, height));
@@ -223,13 +403,8 @@
       };
     }
 
-    function getCols() {
-      return Number(colsRange.value);
-    }
-
-    function getRows() {
-      return Number(rowsRange.value);
-    }
+    function getCols() { return Number(colsRange.value); }
+    function getRows() { return Number(rowsRange.value); }
 
     function updateLabels() {
       colsValue.textContent = String(getCols());
@@ -238,66 +413,63 @@
       strokeColorValue.textContent = strokeColorInput.value.toUpperCase();
     }
 
-    function initializePuzzleState() {
+    function initTabs(randomize = false) {
       const cols = getCols();
       const rows = getRows();
 
-      currentVerticalOffsets = Array.from({ length: Math.max(0, cols - 1) }, () => 50);
-      currentHorizontalOffsets = Array.from({ length: Math.max(0, rows - 1) }, () => 50);
-
-      currentVerticalTabs = Array.from(
-        { length: rows },
-        (_, row) => Array.from({ length: Math.max(0, cols - 1) }, (_, col) => ((row + col) % 2 === 0 ? 1 : -1))
+      verticalTabs = Array.from({ length: rows }, (_, row) =>
+        Array.from({ length: Math.max(0, cols - 1) }, (_, col) => {
+          if (randomize) return Math.random() > 0.5 ? 1 : -1;
+          return (row + col) % 2 === 0 ? 1 : -1;
+        })
       );
 
-      currentHorizontalTabs = Array.from(
-        { length: Math.max(0, rows - 1) },
-        (_, row) => Array.from({ length: cols }, (_, col) => ((row + col) % 2 === 0 ? -1 : 1))
+      horizontalTabs = Array.from({ length: Math.max(0, rows - 1) }, (_, row) =>
+        Array.from({ length: cols }, (_, col) => {
+          if (randomize) return Math.random() > 0.5 ? 1 : -1;
+          return (row + col) % 2 === 0 ? -1 : 1;
+        })
       );
     }
 
-    function randomizeTabs() {
+    function getPieceTabs(row, col) {
       const cols = getCols();
       const rows = getRows();
-
-      currentVerticalTabs = Array.from(
-        { length: rows },
-        () => Array.from({ length: Math.max(0, cols - 1) }, () => (Math.random() > 0.5 ? 1 : -1))
-      );
-
-      currentHorizontalTabs = Array.from(
-        { length: Math.max(0, rows - 1) },
-        () => Array.from({ length: cols }, () => (Math.random() > 0.5 ? 1 : -1))
-      );
+      return {
+        top: row === 0 ? 0 : -horizontalTabs[row - 1][col],
+        right: col === cols - 1 ? 0 : verticalTabs[row][col],
+        bottom: row === rows - 1 ? 0 : horizontalTabs[row][col],
+        left: col === 0 ? 0 : -verticalTabs[row][col - 1]
+      };
     }
 
-    function drawHorizontalSeam(y, col, dir, offsetPercent, cellW, radius) {
-      const x0 = col * cellW;
-      const cx = x0 + cellW * (offsetPercent / 100);
+    function drawPiecePath(context, x, y, w, h, tabs, tabSize) {
+      const r = tabSize;
+      const mx = x + w / 2;
+      const my = y + h / 2;
 
-      ctx.beginPath();
-      ctx.moveTo(x0, y);
-      ctx.lineTo(cx - radius, y);
-      ctx.arc(cx, y, radius, Math.PI, 0, dir < 0);
-      ctx.lineTo(x0 + cellW, y);
-      ctx.stroke();
+      context.beginPath();
+      context.moveTo(x, y);
+
+      context.lineTo(mx - r, y);
+      if (tabs.top !== 0) context.arc(mx, y, r, Math.PI, 0, tabs.top < 0);
+      context.lineTo(x + w, y);
+
+      context.lineTo(x + w, my - r);
+      if (tabs.right !== 0) context.arc(x + w, my, r, -Math.PI / 2, Math.PI / 2, tabs.right < 0);
+      context.lineTo(x + w, y + h);
+
+      context.lineTo(mx + r, y + h);
+      if (tabs.bottom !== 0) context.arc(mx, y + h, r, 0, Math.PI, tabs.bottom < 0);
+      context.lineTo(x, y + h);
+
+      context.lineTo(x, my + r);
+      if (tabs.left !== 0) context.arc(x, my, r, Math.PI / 2, -Math.PI / 2, tabs.left < 0);
+      context.closePath();
     }
 
-    function drawVerticalSeam(x, row, dir, offsetPercent, cellH, radius) {
-      const y0 = row * cellH;
-      const cy = y0 + cellH * (offsetPercent / 100);
-
-      ctx.beginPath();
-      ctx.moveTo(x, y0);
-      ctx.lineTo(x, cy - radius);
-      ctx.arc(x, cy, radius, -Math.PI / 2, Math.PI / 2, dir < 0);
-      ctx.lineTo(x, y0 + cellH);
-      ctx.stroke();
-    }
-
-    function drawPuzzle() {
+    function renderMainPuzzle() {
       if (!currentImage) return;
-
       const cols = getCols();
       const rows = getRows();
       const fitted = fitSize(currentImage.naturalWidth || currentImage.width, currentImage.naturalHeight || currentImage.height);
@@ -305,11 +477,10 @@
       const height = fitted.height;
       const cellW = width / cols;
       const cellH = height / rows;
-      const radius = Math.min(cellW, cellH) * 0.14;
+      const tabSize = Math.min(cellW, cellH) * 0.18;
 
       canvas.width = width;
       canvas.height = height;
-
       ctx.clearRect(0, 0, width, height);
       ctx.drawImage(currentImage, 0, 0, width, height);
 
@@ -318,33 +489,13 @@
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      ctx.beginPath();
-      ctx.rect(0, 0, width, height);
-      ctx.stroke();
-
       for (let row = 0; row < rows; row += 1) {
-        for (let col = 1; col < cols; col += 1) {
-          drawVerticalSeam(
-            col * cellW,
-            row,
-            currentVerticalTabs[row][col - 1],
-            currentVerticalOffsets[col - 1] ?? 50,
-            cellH,
-            radius
-          );
-        }
-      }
-
-      for (let row = 1; row < rows; row += 1) {
         for (let col = 0; col < cols; col += 1) {
-          drawHorizontalSeam(
-            row * cellH,
-            col,
-            currentHorizontalTabs[row - 1][col],
-            currentHorizontalOffsets[row - 1] ?? 50,
-            cellW,
-            radius
-          );
+          const tabs = getPieceTabs(row, col);
+          const x = col * cellW;
+          const y = row * cellH;
+          drawPiecePath(ctx, x, y, cellW, cellH, tabs, tabSize);
+          ctx.stroke();
         }
       }
 
@@ -352,6 +503,7 @@
       placeholder.style.display = 'none';
       saveBtn.disabled = false;
       shuffleBtn.disabled = false;
+      playBtn.disabled = false;
     }
 
     function setError(message) {
@@ -361,68 +513,391 @@
       canvas.style.display = 'none';
       saveBtn.disabled = true;
       shuffleBtn.disabled = true;
+      playBtn.disabled = true;
+    }
+
+    function useLoadedImage(img) {
+      currentImage = img;
+      initTabs(false);
+      updateLabels();
+      renderMainPuzzle();
+    }
+
+    function loadExampleImage(src, label) {
+      placeholder.textContent = `Загрузка примера: ${label}...`;
+      placeholder.style.display = 'block';
+      canvas.style.display = 'none';
+      saveBtn.disabled = true;
+      shuffleBtn.disabled = true;
+      playBtn.disabled = true;
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => useLoadedImage(img);
+      img.onerror = () => setError(`Не удалось загрузить пример: ${label}`);
+      img.src = src;
+    }
+
+    function updatePiecesStatus() {
+      const locked = playPieces.filter((piece) => piece.locked).length;
+      piecesStatus.textContent = `Собрано: ${locked} из ${playPieces.length}`;
+      winBanner.style.display = locked === playPieces.length && playPieces.length > 0 ? 'block' : 'none';
+    }
+
+    function buildPieceCanvas(row, col, boardWidth, boardHeight) {
+      const cols = getCols();
+      const rows = getRows();
+      const sourceCellW = canvas.width / cols;
+      const sourceCellH = canvas.height / rows;
+      const sourceTabSize = Math.min(sourceCellW, sourceCellH) * 0.18;
+      const cellW = boardWidth / cols;
+      const cellH = boardHeight / rows;
+      const tabSize = Math.min(cellW, cellH) * 0.18;
+      const tabs = getPieceTabs(row, col);
+
+      const sourceMarginTop = tabs.top === 1 ? sourceTabSize : 0;
+      const sourceMarginRight = tabs.right === 1 ? sourceTabSize : 0;
+      const sourceMarginBottom = tabs.bottom === 1 ? sourceTabSize : 0;
+      const sourceMarginLeft = tabs.left === 1 ? sourceTabSize : 0;
+
+      const marginTop = tabs.top === 1 ? tabSize : 0;
+      const marginRight = tabs.right === 1 ? tabSize : 0;
+      const marginBottom = tabs.bottom === 1 ? tabSize : 0;
+      const marginLeft = tabs.left === 1 ? tabSize : 0;
+
+      const pieceCanvas = document.createElement('canvas');
+      pieceCanvas.width = Math.round(cellW + marginLeft + marginRight);
+      pieceCanvas.height = Math.round(cellH + marginTop + marginBottom);
+      const pctx = pieceCanvas.getContext('2d');
+
+      pctx.clearRect(0, 0, pieceCanvas.width, pieceCanvas.height);
+      drawPiecePath(pctx, marginLeft, marginTop, cellW, cellH, tabs, tabSize);
+      pctx.save();
+      pctx.clip();
+      pctx.drawImage(
+        canvas,
+        col * sourceCellW - sourceMarginLeft,
+        row * sourceCellH - sourceMarginTop,
+        sourceCellW + sourceMarginLeft + sourceMarginRight,
+        sourceCellH + sourceMarginTop + sourceMarginBottom,
+        0,
+        0,
+        pieceCanvas.width,
+        pieceCanvas.height
+      );
+      pctx.restore();
+
+      return {
+        canvas: pieceCanvas,
+        width: pieceCanvas.width,
+        height: pieceCanvas.height,
+        cellW,
+        cellH,
+        marginLeft,
+        marginTop,
+        marginRight,
+        marginBottom
+      };
+    }
+
+    function clearPlayArea() {
+      playPieces = [];
+      boardArea.querySelectorAll('.piece').forEach((el) => el.remove());
+      trayArea.querySelectorAll('.piece').forEach((el) => el.remove());
+    }
+
+    function clampToBoard(piece, left, top) {
+      const minLeft = -piece.marginLeft;
+      const minTop = -piece.marginTop;
+      const maxLeft = boardArea.clientWidth - (piece.width - piece.marginRight);
+      const maxTop = boardArea.clientHeight - (piece.height - piece.marginBottom);
+      return {
+        left: Math.max(minLeft, Math.min(maxLeft, left)),
+        top: Math.max(minTop, Math.min(maxTop, top))
+      };
+    }
+
+    function returnToTray(piece) {
+      trayArea.appendChild(piece.el);
+      piece.el.style.transform = `scale(${piece.trayScale})`;
+      piece.el.style.left = `${piece.trayLeft}px`;
+      piece.el.style.top = `${piece.trayTop}px`;
+      piece.el.style.zIndex = '1';
+      piece.inBoard = false;
+    }
+
+    function startDrag(piece, event) {
+      if (piece.locked) return;
+      event.preventDefault();
+
+      const pieceRect = piece.el.getBoundingClientRect();
+      const initialParent = piece.el.parentElement;
+      const initialScale = initialParent === trayArea ? piece.trayScale : 1;
+      const offsetX = (event.clientX - pieceRect.left) / initialScale;
+      const offsetY = (event.clientY - pieceRect.top) / initialScale;
+
+      piece.lastPointerX = event.clientX;
+      piece.lastPointerY = event.clientY;
+      piece.el.style.zIndex = String(++zCounter);
+      piece.el.setPointerCapture(event.pointerId);
+
+      function moveToTray(clientX, clientY) {
+        const trayRect = trayArea.getBoundingClientRect();
+        const currentRect = piece.el.getBoundingClientRect();
+        if (piece.el.parentElement !== trayArea) {
+          trayArea.appendChild(piece.el);
+          piece.el.style.transform = `scale(${piece.trayScale})`;
+          piece.el.style.left = `${currentRect.left - trayRect.left}px`;
+          piece.el.style.top = `${currentRect.top - trayRect.top}px`;
+        }
+        const left = clientX - trayRect.left - offsetX * piece.trayScale;
+        const top = clientY - trayRect.top - offsetY * piece.trayScale;
+        piece.el.style.left = `${Math.max(0, left)}px`;
+        piece.el.style.top = `${Math.max(0, top)}px`;
+      }
+
+      function moveToBoard(clientX, clientY) {
+        const boardRect = boardArea.getBoundingClientRect();
+        const currentRect = piece.el.getBoundingClientRect();
+        if (piece.el.parentElement !== boardArea) {
+          boardArea.appendChild(piece.el);
+          piece.el.style.transform = 'scale(1)';
+          piece.el.style.left = `${currentRect.left - boardRect.left}px`;
+          piece.el.style.top = `${currentRect.top - boardRect.top}px`;
+        }
+        const rawLeft = clientX - boardRect.left - offsetX;
+        const rawTop = clientY - boardRect.top - offsetY;
+        const pos = clampToBoard(piece, rawLeft, rawTop);
+        piece.el.style.left = `${pos.left}px`;
+        piece.el.style.top = `${pos.top}px`;
+      }
+
+      function onMove(moveEvent) {
+        piece.lastPointerX = moveEvent.clientX;
+        piece.lastPointerY = moveEvent.clientY;
+
+        const trayRect = trayArea.getBoundingClientRect();
+        const overTray =
+          moveEvent.clientX >= trayRect.left &&
+          moveEvent.clientX <= trayRect.right &&
+          moveEvent.clientY >= trayRect.top &&
+          moveEvent.clientY <= trayRect.bottom;
+
+        if (overTray) {
+          moveToTray(moveEvent.clientX, moveEvent.clientY);
+        } else {
+          moveToBoard(moveEvent.clientX, moveEvent.clientY);
+        }
+      }
+
+      function onUp(upEvent) {
+        piece.lastPointerX = upEvent.clientX;
+        piece.lastPointerY = upEvent.clientY;
+        piece.el.releasePointerCapture(upEvent.pointerId);
+        piece.el.removeEventListener('pointermove', onMove);
+        piece.el.removeEventListener('pointerup', onUp);
+        piece.el.removeEventListener('pointercancel', onUp);
+        finishDrop(piece);
+      }
+
+      piece.el.addEventListener('pointermove', onMove);
+      piece.el.addEventListener('pointerup', onUp);
+      piece.el.addEventListener('pointercancel', onUp);
+    }
+
+    function finishDrop(piece) {
+      const trayRect = trayArea.getBoundingClientRect();
+      const pointerOverTray =
+        typeof piece.lastPointerX === 'number' &&
+        typeof piece.lastPointerY === 'number' &&
+        piece.lastPointerX >= trayRect.left &&
+        piece.lastPointerX <= trayRect.right &&
+        piece.lastPointerY >= trayRect.top &&
+        piece.lastPointerY <= trayRect.bottom;
+
+      if (pointerOverTray && !piece.locked) {
+        returnToTray(piece);
+        updatePiecesStatus();
+        return;
+      }
+
+      if (piece.el.parentElement !== boardArea) {
+        returnToTray(piece);
+        updatePiecesStatus();
+        return;
+      }
+
+      const left = parseFloat(piece.el.style.left || '0');
+      const top = parseFloat(piece.el.style.top || '0');
+      const distance = Math.hypot(left - piece.targetLeft, top - piece.targetTop);
+      const snap = Math.max(18, Math.min(piece.cellW, piece.cellH) * 0.22);
+
+      if (distance <= snap) {
+        piece.el.style.transform = 'scale(1)';
+        piece.el.style.left = `${piece.targetLeft}px`;
+        piece.el.style.top = `${piece.targetTop}px`;
+        piece.el.classList.add('locked');
+        piece.locked = true;
+        piece.inBoard = true;
+      }
+
+      updatePiecesStatus();
+    }
+
+    function layoutTrayPieces(shuffled) {
+      const gap = 10;
+      const maxWidth = Math.max(140, trayArea.clientWidth - 24);
+      let x = 0;
+      let y = 0;
+      let rowHeight = 0;
+
+      shuffled.forEach((piece) => {
+        const trayScale = Math.min(0.72, Math.max(0.46, (maxWidth / Math.max(piece.width * 3.2, 1))));
+        const scaledWidth = piece.width * trayScale;
+        const scaledHeight = piece.height * trayScale;
+
+        if (x + scaledWidth > maxWidth && x > 0) {
+          x = 0;
+          y += rowHeight + gap;
+          rowHeight = 0;
+        }
+
+        piece.trayScale = trayScale;
+        piece.trayLeft = x;
+        piece.trayTop = y;
+
+        trayArea.appendChild(piece.el);
+        piece.el.style.transform = `scale(${trayScale})`;
+        piece.el.style.transformOrigin = 'top left';
+        piece.el.style.left = `${x}px`;
+        piece.el.style.top = `${y}px`;
+        piece.el.style.zIndex = '1';
+
+        x += scaledWidth + gap;
+        rowHeight = Math.max(rowHeight, scaledHeight);
+      });
+
+      trayArea.style.minHeight = `${Math.max(420, y + rowHeight + 12)}px`;
+    }
+
+    function createPlayPieces(boardWidth, boardHeight) {
+      clearPlayArea();
+      zCounter = 10;
+      const cols = getCols();
+      const rows = getRows();
+
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 0; col < cols; col += 1) {
+          const rendered = buildPieceCanvas(row, col, boardWidth, boardHeight);
+          const el = document.createElement('canvas');
+          el.width = rendered.width;
+          el.height = rendered.height;
+          el.className = 'piece';
+          el.getContext('2d').drawImage(rendered.canvas, 0, 0);
+
+          const piece = {
+            row,
+            col,
+            el,
+            width: rendered.width,
+            height: rendered.height,
+            cellW: rendered.cellW,
+            cellH: rendered.cellH,
+            marginLeft: rendered.marginLeft,
+            marginTop: rendered.marginTop,
+            marginRight: rendered.marginRight,
+            marginBottom: rendered.marginBottom,
+            targetLeft: col * rendered.cellW - rendered.marginLeft,
+            targetTop: row * rendered.cellH - rendered.marginTop,
+            trayLeft: 0,
+            trayTop: 0,
+            trayScale: 0.6,
+            locked: false,
+            inBoard: false
+          };
+
+          el.addEventListener('pointerdown', (event) => startDrag(piece, event));
+          playPieces.push(piece);
+        }
+      }
+
+      const shuffled = [...playPieces].sort(() => Math.random() - 0.5);
+      layoutTrayPieces(shuffled);
+      updatePiecesStatus();
+    }
+
+    function openPlayModal() {
+      if (!currentImage) return;
+      const maxBoardSide = Math.min(900, Math.max(520, window.innerHeight - 220));
+      const fitted = fitSize(canvas.width, canvas.height, maxBoardSide);
+      boardArea.style.width = `${fitted.width}px`;
+      boardArea.style.height = `${fitted.height}px`;
+      boardSilhouette.style.backgroundImage = `url(${canvas.toDataURL('image/png')})`;
+      playModal.classList.add('open');
+      requestAnimationFrame(() => createPlayPieces(fitted.width, fitted.height));
+    }
+
+    function closePlayModal() {
+      playModal.classList.remove('open');
+      clearPlayArea();
     }
 
     fileInput.addEventListener('change', (event) => {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
-
       reader.onload = (loadEvent) => {
         const src = loadEvent.target && loadEvent.target.result;
-        if (!src) {
-          setError('Не удалось прочитать изображение');
-          return;
-        }
-
+        if (!src) return setError('Не удалось прочитать изображение');
         const img = new Image();
-        img.onload = () => {
-          currentImage = img;
-          initializePuzzleState();
-          updateLabels();
-          drawPuzzle();
-        };
-        img.onerror = () => {
-          setError('Не удалось загрузить изображение');
-        };
+        img.onload = () => useLoadedImage(img);
+        img.onerror = () => setError('Не удалось загрузить изображение');
         img.src = src;
       };
-
-      reader.onerror = () => {
-        setError('Ошибка чтения файла');
-      };
-
+      reader.onerror = () => setError('Ошибка чтения файла');
       reader.readAsDataURL(file);
       fileInput.value = '';
     });
 
     colsRange.addEventListener('input', () => {
       updateLabels();
-      initializePuzzleState();
-      drawPuzzle();
+      initTabs(false);
+      renderMainPuzzle();
     });
 
     rowsRange.addEventListener('input', () => {
       updateLabels();
-      initializePuzzleState();
-      drawPuzzle();
+      initTabs(false);
+      renderMainPuzzle();
     });
 
     strokeWidthRange.addEventListener('input', () => {
       updateLabels();
-      drawPuzzle();
+      renderMainPuzzle();
     });
 
     strokeColorInput.addEventListener('input', () => {
       updateLabels();
-      drawPuzzle();
+      renderMainPuzzle();
     });
 
     shuffleBtn.addEventListener('click', () => {
       if (!currentImage) return;
-      randomizeTabs();
-      drawPuzzle();
+      initTabs(true);
+      renderMainPuzzle();
+    });
+
+    playBtn.addEventListener('click', openPlayModal);
+    closeModalBtn.addEventListener('click', closePlayModal);
+    reshufflePlayBtn.addEventListener('click', () => {
+      if (!currentImage) return;
+      const maxBoardSide = Math.min(900, Math.max(520, window.innerHeight - 220));
+      const fitted = fitSize(canvas.width, canvas.height, maxBoardSide);
+      createPlayPieces(fitted.width, fitted.height);
+    });
+
+    playModal.addEventListener('click', (event) => {
+      if (event.target === playModal) closePlayModal();
     });
 
     saveBtn.addEventListener('click', () => {
@@ -433,8 +908,12 @@
       link.click();
     });
 
+    exampleCards.forEach((card) => {
+      card.addEventListener('click', () => loadExampleImage(card.dataset.src, card.dataset.label));
+    });
+
     updateLabels();
-    initializePuzzleState();
+    initTabs(false);
   </script>
 </body>
 </html>
