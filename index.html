@@ -442,16 +442,16 @@
     <div class="preview-wrap">
       <div class="section-title">Примеры фотографий</div>
       <div class="examples-grid">
-        <button class="example-card" data-label="Горы" data-src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80">
-          <img alt="Горы" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=60" />
-          <div>Горы</div>
+        <button class="example-card" data-label="Самолёт" data-src="images/plane.jpg">
+          <img alt="Самолёт" src="images/plane.jpg" />
+          <div>Самолёт</div>
         </button>
-        <button class="example-card" data-label="Кот" data-src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=1200&q=80">
-          <img alt="Кот" src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=400&q=60" />
-          <div>Кот</div>
+        <button class="example-card" data-label="Корабль" data-src="images/ship.jpg">
+          <img alt="Корабль" src="ship.jpg" />
+          <div>Корабль</div>
         </button>
-        <button class="example-card" data-label="Город" data-src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80">
-          <img alt="Город" src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=400&q=60" />
+        <button class="example-card" data-label="Город" data-src="city.jpg">
+          <img alt="Город" src="city.jpg" />
           <div>Город</div>
         </button>
       </div>
@@ -706,7 +706,6 @@
       playBtn.disabled = true;
 
       const img = new Image();
-      img.crossOrigin = 'anonymous';
       img.onload = () => useLoadedImage(img);
       img.onerror = () => setError(`Не удалось загрузить пример: ${label}`);
       img.src = src;
