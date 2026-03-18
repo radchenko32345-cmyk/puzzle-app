@@ -248,6 +248,7 @@
       grid-template-columns: minmax(640px, 1fr) 440px;
       gap: 18px;
       align-items: start;
+      min-width: 0;
     }
 
     .board-wrap,
@@ -256,6 +257,7 @@
       border-radius: 18px;
       padding: 14px;
       border: 1px solid var(--line);
+      min-width: 0;
     }
 
     .board-wrap {
@@ -281,6 +283,8 @@
         radial-gradient(circle at bottom right, rgba(255,255,255,0.05), transparent 26%),
         linear-gradient(180deg, #2d2d2d 0%, #444444 100%);
       margin: 0 auto;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     .board-silhouette {
@@ -386,17 +390,178 @@
       margin-bottom: 20px;
     }
 
-    @media (max-width: 1100px) {
-      .play-layout {
+    .app-version {
+      position: fixed;
+      right: 16px;
+      bottom: 12px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.55);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 4000;
+      backdrop-filter: blur(4px);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .app {
+        padding: 14px;
+        border-radius: 18px;
+      }
+
+      h1 {
+        font-size: 24px;
+        line-height: 1.2;
+      }
+
+      p {
+        font-size: 14px;
+      }
+
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+      }
+
+      .btn,
+      label.btn,
+      .range-wrap {
+        width: 100%;
+        min-height: 48px;
+      }
+
+      .range-wrap {
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .range-wrap input[type="range"] {
+        width: 100%;
+      }
+
+      .examples-grid {
         grid-template-columns: 1fr;
       }
 
+      .example-card img {
+        height: 150px;
+      }
+
+      .modal-content {
+        padding: 14px;
+      }
+
+      .modal-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .modal-header > div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .play-layout {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .board-wrap,
       .tray-wrap {
-        order: 2;
+        width: 100%;
+        padding: 12px;
+      }
+
+      .board-wrap h3,
+      .tray-wrap h3 {
+        font-size: 15px;
       }
 
       .tray-area {
-        height: 360px;
+        height: 260px;
+        min-height: 260px;
+      }
+
+      #previewPanel img,
+      #resultPreview {
+        max-height: 120px !important;
+      }
+
+      .status-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .status-bar .btn {
+        width: 100%;
+      }
+
+      .win-box {
+        width: calc(100vw - 30px);
+        min-width: unset;
+        padding: 24px 18px;
+      }
+
+      .win-text {
+        font-size: 20px;
+      }
+
+      .footer-note {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .app-version {
+        right: 10px;
+        bottom: 10px;
+        font-size: 12px;
+        padding: 5px 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 21px;
+      }
+
+      .app {
+        padding: 12px;
+      }
+
+      .preview-wrap {
+        padding: 12px;
+      }
+
+      .stage {
+        min-height: 180px;
+        padding: 8px;
+      }
+
+      .tray-area {
+        height: 220px;
+        min-height: 220px;
+      }
+
+      .modal-title {
+        font-size: 20px;
+      }
+
+      .modal-subtitle {
+        font-size: 13px;
+      }
+
+      .btn,
+      label.btn {
+        font-size: 14px;
+        padding: 11px 14px;
       }
     }
   </style>
@@ -439,21 +604,22 @@
       <button id="saveBtn" class="btn save" disabled>Сохранить пазл</button>
     </div>
 
-    <div class="examples-grid">
-      <button class="example-card" data-label="Самолёт" data-src="images/plane.jpg">
-        <img alt="Самолёт" src="images/plane.jpg" />
-        <div>Самолёт</div>
-      </button>
-
-      <button class="example-card" data-label="Корабль" data-src="images/ship.jpg">
-        <img alt="Корабль" src="images/ship.jpg" />
-        <div>Корабль</div>
-      </button>
-
-      <button class="example-card" data-label="Город" data-src="images/city.jpg">
-        <img alt="Город" src="images/city.jpg" />
-        <div>Город</div>
-      </button>
+    <div class="preview-wrap">
+      <div class="section-title">Примеры фотографий</div>
+      <div class="examples-grid">
+        <button class="example-card" data-label="Самолёт" data-src="images/plane.jpg">
+          <img alt="Самолёт" src="images/plane.jpg" />
+          <div>Самолёт</div>
+        </button>
+        <button class="example-card" data-label="Корабль" data-src="images/ship.jpg">
+          <img alt="Корабль" src="images/ship.jpg" />
+          <div>Корабль</div>
+        </button>
+        <button class="example-card" data-label="Город" data-src="images/city.jpg">
+          <img alt="Город" src="images/city.jpg" />
+          <div>Город</div>
+        </button>
+      </div>
     </div>
 
     <div class="preview-wrap">
@@ -522,6 +688,8 @@
     </div>
   </div>
 
+  <div class="app-version">Версия 1.0</div>
+
   <script>
     const fileInput = document.getElementById('fileInput');
     const saveBtn = document.getElementById('saveBtn');
@@ -560,6 +728,7 @@
     let horizontalTabs = [];
     let playPieces = [];
     let zCounter = 10;
+    let resizeTimer = null;
 
     function fitSize(width, height, maxSide = 1100) {
       const scale = Math.min(1, maxSide / Math.max(width, height));
@@ -722,16 +891,24 @@
 
     function getBoardSize() {
       const boardWrap = boardArea.closest('.board-wrap');
-      const boardPadding = 32;
-      const wrapInnerWidth = boardWrap ? Math.max(420, boardWrap.clientWidth - boardPadding) : 900;
-      const maxHeight = Math.max(420, window.innerHeight - 220);
+      const isMobile = window.innerWidth <= 768;
+
+      const wrapWidth = boardWrap ? boardWrap.clientWidth : window.innerWidth;
+      const horizontalPadding = isMobile ? 24 : 40;
+      const availableWidth = Math.max(220, wrapWidth - horizontalPadding);
+
+      const viewportHeight = window.innerHeight;
+      const availableHeight = isMobile
+        ? Math.max(200, viewportHeight * 0.34)
+        : Math.max(320, viewportHeight - 260);
+
       const imageAspect = canvas.width / canvas.height;
 
-      let finalWidth = wrapInnerWidth;
+      let finalWidth = availableWidth;
       let finalHeight = Math.round(finalWidth / imageAspect);
 
-      if (finalHeight > maxHeight) {
-        finalHeight = maxHeight;
+      if (finalHeight > availableHeight) {
+        finalHeight = availableHeight;
         finalWidth = Math.round(finalHeight * imageAspect);
       }
 
@@ -821,12 +998,13 @@
     }
 
     function layoutTrayPieces(shuffled) {
+      const isMobile = window.innerWidth <= 768;
       const topPadding = 18;
       const sidePadding = 18;
-      const gap = 22;
+      const gap = isMobile ? 16 : 22;
 
       const usableWidth = Math.max(120, trayArea.clientWidth - sidePadding * 2);
-      const maxPieceWidth = usableWidth * 0.84;
+      const maxPieceWidth = usableWidth * (isMobile ? 0.62 : 0.84);
 
       let y = topPadding;
       let contentHeight = topPadding;
@@ -870,15 +1048,14 @@
         .filter((piece) => !piece.inBoard)
         .sort((a, b) => a.trayOrder - b.trayOrder);
 
+      trayScroll.innerHTML = '';
       layoutTrayPieces(trayPieces);
     }
 
     function returnToTray(piece) {
-      piece.el.classList.remove('locked');
       piece.locked = false;
       piece.inBoard = false;
-
-      trayScroll.appendChild(piece.el);
+      piece.el.classList.remove('locked');
       refreshTrayLayout();
     }
 
@@ -1039,21 +1216,74 @@
     }
 
     function applyBoardSizeAndSync() {
+      if (!currentImage || !playModal.classList.contains('open')) return;
+
       const { finalWidth, finalHeight } = getBoardSize();
+
+      const oldWidth = boardArea.clientWidth || finalWidth;
+      const oldHeight = boardArea.clientHeight || finalHeight;
+
+      const scaleX = oldWidth > 0 ? finalWidth / oldWidth : 1;
+      const scaleY = oldHeight > 0 ? finalHeight / oldHeight : 1;
+
       boardArea.style.width = `${finalWidth}px`;
       boardArea.style.height = `${finalHeight}px`;
       boardSilhouette.style.backgroundImage = 'none';
-      winPopup.classList.remove('show');
-      createPlayPieces(finalWidth, finalHeight);
+
+      if (playPieces.length === 0) {
+        createPlayPieces(finalWidth, finalHeight);
+        return;
+      }
+
+      playPieces.forEach((piece) => {
+        const oldTargetLeft = piece.targetLeft;
+        const oldTargetTop = piece.targetTop;
+
+        piece.cellW = finalWidth / getCols();
+        piece.cellH = finalHeight / getRows();
+        piece.targetLeft = Math.round(piece.col * piece.cellW - piece.marginLeft);
+        piece.targetTop = Math.round(piece.row * piece.cellH - piece.marginTop);
+
+        if (piece.inBoard) {
+          if (piece.locked) {
+            piece.el.style.left = `${piece.targetLeft}px`;
+            piece.el.style.top = `${piece.targetTop}px`;
+          } else {
+            const currentLeft = parseFloat(piece.el.style.left || '0');
+            const currentTop = parseFloat(piece.el.style.top || '0');
+
+            if (Number.isFinite(currentLeft) && Number.isFinite(currentTop)) {
+              piece.el.style.left = `${currentLeft * scaleX}px`;
+              piece.el.style.top = `${currentTop * scaleY}px`;
+            } else {
+              const dx = piece.targetLeft - oldTargetLeft;
+              const dy = piece.targetTop - oldTargetTop;
+              piece.el.style.left = `${dx}px`;
+              piece.el.style.top = `${dy}px`;
+            }
+          }
+        }
+      });
+
+      refreshTrayLayout();
     }
 
     function openPlayModal() {
       if (!currentImage) return;
+
       playModal.classList.add('open');
       resultPreview.src = currentImage.src;
       previewPanel.style.display = 'none';
       togglePreviewBtn.textContent = 'Показать образец';
-      requestAnimationFrame(() => applyBoardSizeAndSync());
+
+      clearPlayArea();
+
+      requestAnimationFrame(() => {
+        const { finalWidth, finalHeight } = getBoardSize();
+        boardArea.style.width = `${finalWidth}px`;
+        boardArea.style.height = `${finalHeight}px`;
+        createPlayPieces(finalWidth, finalHeight);
+      });
     }
 
     function closePlayModal() {
@@ -1123,17 +1353,22 @@
 
     reshufflePlayBtn.addEventListener('click', () => {
       if (!currentImage) return;
-      const shuffled = shuffleArray(playPieces);
+
+      const freePieces = playPieces.filter((piece) => !piece.inBoard);
+      const shuffled = shuffleArray(freePieces);
+
       shuffled.forEach((piece, index) => {
         piece.trayOrder = index;
       });
-      applyBoardSizeAndSync();
+
+      refreshTrayLayout();
     });
 
     togglePreviewBtn.addEventListener('click', () => {
       const hidden = previewPanel.style.display === 'none';
       previewPanel.style.display = hidden ? 'block' : 'none';
       togglePreviewBtn.textContent = hidden ? 'Скрыть образец' : 'Показать образец';
+      setTimeout(() => applyBoardSizeAndSync(), 0);
     });
 
     playModal.addEventListener('click', (event) => {
@@ -1150,6 +1385,15 @@
         trayArea.scrollTop += event.deltaY;
       }
     }, { passive: false });
+
+    window.addEventListener('resize', () => {
+      if (!playModal.classList.contains('open')) return;
+
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        applyBoardSizeAndSync();
+      }, 80);
+    });
 
     saveBtn.addEventListener('click', () => {
       if (!currentImage) return;
