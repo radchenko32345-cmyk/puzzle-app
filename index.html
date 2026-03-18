@@ -840,12 +840,12 @@
         const scaledHeight = piece.height * trayScale;
 
         const x = sidePadding + Math.max(0, (usableWidth - scaledWidth) / 2);
-        const yPos = y + Math.random() * 10;
+        const yPos = y;
 
         piece.trayScale = trayScale;
         piece.trayRotation = 0;
         piece.trayJitterX = 0;
-        piece.trayJitterY = yPos - y;
+        piece.trayJitterY = 0;
         piece.trayLeft = x;
         piece.trayTop = yPos;
 
