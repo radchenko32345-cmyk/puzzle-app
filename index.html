@@ -684,7 +684,10 @@
     <div class="win-box">
       <div class="win-icon">✔</div>
       <div class="win-text">Пазл успешно собран!</div>
-      <button id="closeWinBtn" class="btn">Закрыть</button>
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button id="restartWinBtn" class="btn secondary">Собрать заново</button>
+        <button id="closeWinBtn" class="btn">Закрыть</button>
+      </div>
     </div>
   </div>
 
@@ -722,6 +725,7 @@
     const winBanner = document.getElementById('winBanner');
     const winPopup = document.getElementById('winPopup');
     const closeWinBtn = document.getElementById('closeWinBtn');
+    const restartWinBtn = document.getElementById('restartWinBtn');
 
     let currentImage = null;
     let verticalTabs = [];
@@ -1416,6 +1420,17 @@
 
     closeWinBtn.onclick = () => {
       winPopup.classList.remove('show');
+    };
+
+    restartWinBtn.onclick = () => {
+      winPopup.classList.remove('show');
+
+      if (!currentImage) return;
+
+      const { finalWidth, finalHeight } = getBoardSize();
+      boardArea.style.width = `${finalWidth}px`;
+      boardArea.style.height = `${finalHeight}px`;
+      createPlayPieces(finalWidth, finalHeight);
     };
 
     trayArea.addEventListener('wheel', (event) => {
