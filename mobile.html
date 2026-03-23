@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Пазл из фото</title>
+<style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #151515;
+      --line: rgba(255, 255, 255, 0.12);
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.68);
+      --button: #ffffff;
+      --button-text: #000000;
+      --button-alt: #232323;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(180deg, #050505, #111111);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1120px;
+      background: linear-gradient(180deg, #121212, #0d0d0d);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+
+    p {
+      color: var(--muted);
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+      align-items: stretch;
+    }
+
+    .controls > * {
+      min-width: 0;
+    }
+
+    .action-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .compact-control {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px 10px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      border-radius: 14px;
+      min-height: 44px;
+    }
+
+    .compact-control .control-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      grid-column: 1 / -1;
+      min-width: 0;
+    }
+
+    .compact-control .control-label {
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .compact-control strong {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .compact-control input[type="range"] {
+      width: 100%;
+      margin: 0;
+    }
+
+    .compact-control input[type="color"] {
+      width: 38px;
+      height: 30px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .control-size {
+      grid-column: span 3;
+    }
+
+    .control-stroke {
+      grid-column: span 2;
+    }
+
+    .control-color {
+      grid-column: span 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .control-color .control-top {
+      grid-column: auto;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+
+    .control-save {
+      grid-column: span 3;
+    }
+
+    .btn, label.btn {
+      background: var(--button-alt);
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      min-height: 46px;
+    }
+
+    .btn.play,
+    .btn.save {
+      background: #ffffff;
+      color: #000000;
+      border-color: rgba(255,255,255,0.9);
+    }
+
+    .btn.secondary {
+      background: var(--button-alt);
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    input[type="file"] { display: none; }
+
+    .preview-wrap {
+      background: linear-gradient(180deg, #111111, #181818);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      min-height: 260px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: auto;
+      border-radius: 16px;
+      background: #0a0a0a;
+      border: 1px dashed rgba(255, 255, 255, 0.14);
+      padding: 12px;
+    }
+
+    canvas.main-canvas {
+      display: none;
+      max-width: 100%;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42);
+      background: #000;
+    }
+
+    .placeholder {
+      width: 100%;
+      text-align: center;
+      color: var(--muted);
+      padding: 48px 20px;
+      border: 2px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .range-wrap { display: none; }
+
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+    }
+
+    .example-card {
+      padding: 0;
+      border: 1px solid var(--line);
+      background: #111;
+      color: #fff;
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .example-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .example-card div {
+      padding: 12px 14px;
+      font-weight: 700;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      display: none;
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 0;
+      z-index: 1000;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-content {
+      width: 100vw;
+      height: 100vh;
+      overflow: auto;
+      background: linear-gradient(180deg, #101010, #171717);
+      border: none;
+      border-radius: 0;
+      padding: 24px;
+      box-shadow: none;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .modal-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .modal-subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .play-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
+
+    .board-wrap,
+    .tray-wrap {
+      background: linear-gradient(180deg, #141414, #1a1a1a);
+      border-radius: 18px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      min-width: 0;
+    }
+
+    .board-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 0 0 auto;
+      overflow: hidden;
+    }
+
+    .board-wrap h3,
+    .tray-wrap h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    .tray-wrap {
+      display: flex;
+      flex-direction: column;
+      flex: 0 0 190px;
+      min-height: 190px;
+      margin-top: auto;
+    }
+
+    .board-area {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.07), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(255,255,255,0.05), transparent 26%),
+        linear-gradient(180deg, #2d2d2d 0%, #444444 100%);
+      margin: 0 auto;
+      max-width: 100%;
+      flex: 0 0 auto;
+    }
+
+    .board-silhouette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      background-size: cover;
+      background-position: center;
+      filter: none;
+    }
+
+    .tray-area {
+      position: relative;
+      min-height: 132px;
+      height: 100%;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.05), transparent 30%),
+        linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.015));
+      border: 1px solid rgba(255,255,255,0.10);
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 14px 14px 22px;
+      scrollbar-width: auto;
+      scrollbar-color: rgba(255,255,255,0.55) rgba(255,255,255,0.12);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tray-area::-webkit-scrollbar {
+      height: 18px;
+    }
+
+    .tray-area::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.10);
+      border-radius: 999px;
+    }
+
+    .tray-area::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.55);
+      border-radius: 999px;
+      border: 3px solid rgba(0,0,0,0);
+      background-clip: padding-box;
+    }
+
+    .tray-scroll {
+      position: relative;
+      height: 100%;
+      min-width: 100%;
+    }
+
+    .piece {
+      display: block !important;
+      position: absolute;
+      touch-action: none;
+      cursor: grab;
+      user-select: none;
+      background: transparent !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .piece.locked {
+      cursor: grab;
+    }
+
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 14px;
+      flex-wrap: wrap;
+    }
+
+    .win-banner {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 14px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .win-popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+
+    .win-popup.show {
+      display: flex;
+    }
+
+    .win-box {
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      min-width: 280px;
+    }
+
+    .win-icon {
+      font-size: 70px;
+      color: #4cff88;
+      margin-bottom: 15px;
+    }
+
+    .win-text {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .app-version {
+      position: fixed;
+      right: 16px;
+      bottom: 12px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.55);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 4000;
+      backdrop-filter: blur(4px);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .app {
+        padding: 14px;
+        border-radius: 18px;
+      }
+
+      h1 {
+        font-size: 24px;
+        line-height: 1.2;
+      }
+
+      p {
+        font-size: 14px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .control-size,
+      .control-stroke,
+      .control-color,
+      .control-save {
+        grid-column: span 3;
+      }
+
+      .action-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .btn,
+      label.btn {
+        width: 100%;
+        min-height: 44px;
+      }
+
+      .compact-control {
+        min-height: 42px;
+        padding: 8px 9px;
+      }
+
+      .compact-control .control-label,
+      .compact-control strong {
+        font-size: 12px;
+      }
+
+      .examples-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .example-card img {
+        height: 150px;
+      }
+
+      .modal-content {
+        padding: 14px;
+      }
+
+      .modal-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .modal-header > div:last-child {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .play-layout {
+        height: calc(100vh - 122px);
+        gap: 12px;
+      }
+
+      .board-wrap,
+      .tray-wrap {
+        width: 100%;
+        padding: 12px;
+      }
+
+      .board-wrap h3,
+      .tray-wrap h3 {
+        font-size: 15px;
+      }
+
+      .tray-area {
+        height: 100%;
+        min-height: 150px;
+      }
+
+      .status-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .status-bar .btn {
+        width: 100%;
+      }
+
+      .win-box {
+        width: calc(100vw - 30px);
+        min-width: unset;
+        padding: 24px 18px;
+      }
+
+      .win-text {
+        font-size: 20px;
+      }
+
+      .footer-note {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .app-version {
+        right: 10px;
+        bottom: 10px;
+        font-size: 12px;
+        padding: 5px 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 21px;
+      }
+
+      .app {
+        padding: 12px;
+      }
+
+      .preview-wrap {
+        padding: 12px;
+      }
+
+      .stage {
+        min-height: 180px;
+        padding: 8px;
+      }
+
+      .tray-area {
+        height: 100%;
+        min-height: 140px;
+      }
+
+      .modal-title {
+        font-size: 20px;
+      }
+
+      .modal-subtitle {
+        font-size: 13px;
+      }
+
+      .btn,
+      label.btn {
+        font-size: 13px;
+        padding: 10px 12px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .control-size,
+      .control-stroke,
+      .control-color,
+      .control-save,
+      .action-row {
+        grid-column: 1 / -1;
+      }
+
+      .compact-control {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .examples-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  
+
+    .game-modal .modal-content {
+      padding: 0;
+      background: linear-gradient(180deg, #090909, #141414);
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .game-toolbar {
+      height: 72px;
+      background: linear-gradient(180deg, #111111, #161616);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: grid;
+      grid-template-columns: repeat(3, 48px) 1fr repeat(3, 48px);
+      align-items: center;
+      gap: 10px;
+      padding: 0 18px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+      position: relative;
+      z-index: 5;
+    }
+
+    .toolbar-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: #ffffff;
+      font-size: 29px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .toolbar-score {
+      justify-self: center;
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: none;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .mobile-reference-layout {
+      height: calc(100vh - 72px);
+      padding: 0;
+      gap: 0;
+      background: linear-gradient(180deg, #090909, #141414);
+    }
+
+    .board-wrap-reference {
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      flex: 1 1 auto;
+      width: 100%;
+      padding: 24px 24px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    .board-wrap-reference h3,
+    .tray-wrap-reference h3,
+    .modal-title,
+    .modal-subtitle,
+    .status-bar { display: none; }
+
+    .board-wrap-reference .board-area {
+      background: linear-gradient(180deg, #2a2a2a 0%, #3a3a3a 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 0;
+      box-shadow: none;
+      margin: 0 auto;
+      max-width: calc(100vw - 48px);
+      max-height: calc(100vh - 72px - 180px - 36px);
+    }
+
+    .tray-wrap-reference {
+      background: linear-gradient(180deg, #101010, #171717);
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-radius: 0;
+      flex: 0 0 165px;
+      min-height: 165px;
+      padding: 14px 0 18px;
+      box-shadow: 0 -4px 18px rgba(0,0,0,0.04);
+    }
+
+    .tray-wrap-reference .tray-area {
+      min-height: 120px;
+      height: 120px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 8px 18px 16px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: auto;
+      scrollbar-color: #bcbcbc transparent;
+    }
+
+    .tray-wrap-reference .tray-area::-webkit-scrollbar {
+      height: 14px;
+    }
+
+    .tray-wrap-reference .tray-area::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.4);
+      border-radius: 999px;
+      border: 3px solid #101010;
+    }
+
+    .tray-wrap-reference .tray-scroll {
+      min-height: 100px;
+      align-items: center;
+      gap: 20px;
+      padding-right: 18px;
+    }
+
+    .tray-wrap-reference .piece {
+      transform-origin: center center;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+        background: #090909;
+      }
+
+      .app {
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        min-height: 100vh;
+      }
+
+      .game-toolbar {
+        padding: 0 14px;
+        grid-template-columns: repeat(3, 42px) 1fr repeat(3, 42px);
+        gap: 8px;
+      }
+
+      .toolbar-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 26px;
+      }
+
+      .toolbar-score {
+        font-size: 24px;
+      }
+
+      .board-wrap-reference {
+        padding: 22px 22px 10px;
+      }
+
+      .board-wrap-reference .board-area {
+        max-width: calc(100vw - 44px);
+        max-height: calc(100vh - 72px - 170px - 34px);
+      }
+
+      .tray-wrap-reference {
+        flex-basis: 170px;
+        min-height: 170px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+<div class="app">
+<h1>Пазл из фото</h1>
+<p>Выберите фото, настройте количество кусочков и внешний вид контура, затем сохраните результат или нажмите «Играть».</p>
+<div class="controls">
+<input accept="image/*" id="fileInput" type="file"/>
+<div class="compact-control control-size">
+<div class="control-top">
+<span class="control-label">Горизонталь</span>
+<strong id="colsValue">4</strong>
+</div>
+<input id="colsRange" max="8" min="2" type="range" value="4"/>
+</div>
+<div class="compact-control control-size">
+<div class="control-top">
+<span class="control-label">Вертикаль</span>
+<strong id="rowsValue">4</strong>
+</div>
+<input id="rowsRange" max="8" min="2" type="range" value="4"/>
+</div>
+<div class="compact-control control-stroke">
+<div class="control-top">
+<span class="control-label">Контур</span>
+<strong id="strokeWidthValue">2</strong>
+</div>
+<input id="strokeWidthRange" max="6" min="1" step="0.2" type="range" value="2"/>
+</div>
+<div class="compact-control control-color">
+<div class="control-top">
+<span class="control-label">Цвет</span>
+<strong id="strokeColorValue">#FFFFFF</strong>
+</div>
+<input id="strokeColorInput" type="color" value="#ffffff"/>
+</div>
+<button class="btn save control-save" disabled="" id="saveBtn">Сохранить пазл</button>
+<div class="action-row">
+<button class="btn secondary" disabled="" id="shuffleBtn">Поменять</button>
+<label class="btn" for="fileInput">Выбрать фото</label>
+<button class="btn play" disabled="" id="playBtn">Играть</button>
+</div>
+</div>
+<div class="preview-wrap">
+<div class="section-title">Предпросмотр пазла</div>
+<div class="stage" id="previewStage">
+<div class="placeholder" id="placeholder">Фото не выбрано. Нажмите «Выбрать фото».</div>
+<canvas class="main-canvas" id="canvas"></canvas>
+</div>
+</div>
+<div class="preview-wrap">
+<div class="section-title">Примеры фотографий</div>
+<div class="examples-grid">
+<button class="example-card" data-label="Самолёт" data-src="images/plane.jpg">
+<img alt="Самолёт" src="images/plane.jpg"/>
+<div>Самолёт</div>
+</button>
+<button class="example-card" data-label="Корабль" data-src="images/ship.jpg">
+<img alt="Корабль" src="images/ship.jpg"/>
+<div>Корабль</div>
+</button>
+<button class="example-card" data-label="Город" data-src="images/city.jpg">
+<img alt="Город" src="images/city.jpg"/>
+<div>Город</div>
+</button>
+</div>
+</div>
+<div class="footer-note">
+<div>Разработал ученик 10 "А" класса Радченко Максим</div>
+<div>МКОУ Бутурлиновская СОШ</div>
+</div>
+</div>
+<div class="modal game-modal" id="playModal">
+<div class="modal-content game-modal-content">
+<div class="game-toolbar">
+<button aria-label="Назад" class="toolbar-btn icon-btn" id="closeModalBtn">←</button>
+<button aria-label="Перемешать" class="toolbar-btn icon-btn" id="reshufflePlayBtn">⇄</button>
+<button aria-label="Контур" class="toolbar-btn icon-btn" type="button">▨</button>
+<div class="toolbar-score" id="piecesStatus">0</div>
+<button aria-label="Подсказка" class="toolbar-btn icon-btn" type="button"></button>
+<button aria-label="Выделить" class="toolbar-btn icon-btn" type="button">⛶</button>
+<button aria-label="Показать" class="toolbar-btn icon-btn" type="button">◉</button>
+</div>
+<div class="play-layout mobile-reference-layout">
+<div class="board-wrap board-wrap-reference">
+<div class="board-area" id="boardArea">
+<div class="board-silhouette" id="boardSilhouette"></div>
+</div>
+</div>
+<div class="tray-wrap tray-wrap-reference">
+<div class="tray-area" id="trayArea">
+<div class="tray-scroll" id="trayScroll"></div>
+</div>
+</div>
+</div>
+<div class="win-banner" id="winBanner">Отлично! Пазл собран.</div>
+</div>
+</div>
+<div class="win-popup" id="winPopup">
+<div class="win-box">
+<div class="win-icon">✔</div>
+<div class="win-text">Пазл успешно собран!</div>
+<div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+<button class="btn secondary" id="restartWinBtn">Собрать заново</button>
+<button class="btn" id="closeWinBtn">Закрыть</button>
+</div>
+</div>
+</div>
+<div class="app-version">Версия 0.69</div>
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const saveBtn = document.getElementById('saveBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const playBtn = document.getElementById('playBtn');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const sourceCanvas = document.createElement('canvas');
+    const sourceCtx = sourceCanvas.getContext('2d');
+    const placeholder = document.getElementById('placeholder');
+    const colsRange = document.getElementById('colsRange');
+    const rowsRange = document.getElementById('rowsRange');
+    const colsValue = document.getElementById('colsValue');
+    const rowsValue = document.getElementById('rowsValue');
+    const strokeWidthRange = document.getElementById('strokeWidthRange');
+    const strokeWidthValue = document.getElementById('strokeWidthValue');
+    const strokeColorInput = document.getElementById('strokeColorInput');
+    const strokeColorValue = document.getElementById('strokeColorValue');
+    const exampleCards = document.querySelectorAll('.example-card');
+
+    const playModal = document.getElementById('playModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const reshufflePlayBtn = document.getElementById('reshufflePlayBtn');
+    const boardArea = document.getElementById('boardArea');
+    const boardSilhouette = document.getElementById('boardSilhouette');
+    const trayArea = document.getElementById('trayArea');
+    const trayScroll = document.getElementById('trayScroll');
+    const piecesStatus = document.getElementById('piecesStatus');
+    const winBanner = document.getElementById('winBanner');
+    const winPopup = document.getElementById('winPopup');
+    const stage = document.getElementById('previewStage');
+    const closeWinBtn = document.getElementById('closeWinBtn');
+    const restartWinBtn = document.getElementById('restartWinBtn');
+
+    let currentImage = null;
+    let verticalTabs = [];
+    let horizontalTabs = [];
+    let playPieces = [];
+    let zCounter = 10;
+    let resizeTimer = null;
+    let currentBoardWidth = 0;
+    let currentBoardHeight = 0;
+    const RENDER_SCALE = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+    function fitIntoBox(width, height, maxWidth, maxHeight) {
+      const safeMaxWidth = Math.max(1, maxWidth || width);
+      const safeMaxHeight = Math.max(1, maxHeight || height);
+      const scale = Math.min(safeMaxWidth / width, safeMaxHeight / height, 1);
+      return {
+        width: Math.max(1, Math.round(width * scale)),
+        height: Math.max(1, Math.round(height * scale))
+      };
+    }
+
+    function fitSize(width, height, maxSide = 1600) {
+      const scale = Math.min(1, maxSide / Math.max(width, height));
+      return {
+        width: Math.max(1, Math.round(width * scale)),
+        height: Math.max(1, Math.round(height * scale))
+      };
+    }
+
+    function getCols() { return Number(colsRange.value); }
+    function getRows() { return Number(rowsRange.value); }
+
+    function getPreviewDisplaySize() {
+      if (!canvas || canvas.style.display === 'none') {
+        return null;
+      }
+      const cssWidth = parseFloat(canvas.style.width || '0');
+      const cssHeight = parseFloat(canvas.style.height || '0');
+      if (cssWidth > 0 && cssHeight > 0) {
+        return { width: Math.round(cssWidth), height: Math.round(cssHeight) };
+      }
+      const rect = canvas.getBoundingClientRect();
+      const width = Math.max(1, Math.round(rect.width));
+      const height = Math.max(1, Math.round(rect.height));
+      if (!width || !height) return null;
+      return { width, height };
+    }
+
+    function updateLabels() {
+      colsValue.textContent = String(getCols());
+      rowsValue.textContent = String(getRows());
+      strokeWidthValue.textContent = String(strokeWidthRange.value);
+      strokeColorValue.textContent = strokeColorInput.value.toUpperCase();
+    }
+
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function initTabs(randomize = false) {
+      const cols = getCols();
+      const rows = getRows();
+
+      verticalTabs = Array.from({ length: rows }, (_, row) =>
+        Array.from({ length: Math.max(0, cols - 1) }, (_, col) =>
+          randomize ? (Math.random() > 0.5 ? 1 : -1) : ((row + col) % 2 === 0 ? 1 : -1)
+        )
+      );
+
+      horizontalTabs = Array.from({ length: Math.max(0, rows - 1) }, (_, row) =>
+        Array.from({ length: cols }, (_, col) =>
+          randomize ? (Math.random() > 0.5 ? 1 : -1) : ((row + col) % 2 === 0 ? -1 : 1)
+        )
+      );
+    }
+
+    function getPieceTabs(row, col) {
+      const cols = getCols();
+      const rows = getRows();
+      return {
+        top: row === 0 ? 0 : -horizontalTabs[row - 1][col],
+        right: col === cols - 1 ? 0 : verticalTabs[row][col],
+        bottom: row === rows - 1 ? 0 : horizontalTabs[row][col],
+        left: col === 0 ? 0 : -verticalTabs[row][col - 1]
+      };
+    }
+
+    function drawPiecePath(context, x, y, w, h, tabs, tabSize) {
+      const r = tabSize;
+      const mx = x + w / 2;
+      const my = y + h / 2;
+
+      context.beginPath();
+      context.moveTo(x, y);
+      context.lineTo(mx - r, y);
+      if (tabs.top !== 0) context.arc(mx, y, r, Math.PI, 0, tabs.top < 0);
+      context.lineTo(x + w, y);
+
+      context.lineTo(x + w, my - r);
+      if (tabs.right !== 0) context.arc(x + w, my, r, -Math.PI / 2, Math.PI / 2, tabs.right < 0);
+      context.lineTo(x + w, y + h);
+
+      context.lineTo(mx + r, y + h);
+      if (tabs.bottom !== 0) context.arc(mx, y + h, r, 0, Math.PI, tabs.bottom < 0);
+      context.lineTo(x, y + h);
+
+      context.lineTo(x, my + r);
+      if (tabs.left !== 0) context.arc(x, my, r, Math.PI / 2, -Math.PI / 2, tabs.left < 0);
+      context.closePath();
+    }
+
+    function renderMainPuzzle() {
+      if (!currentImage) return;
+
+      const cols = getCols();
+      const rows = getRows();
+      const fitted = fitSize(
+        currentImage.naturalWidth || currentImage.width,
+        currentImage.naturalHeight || currentImage.height,
+        2600
+      );
+      const sourceWidth = fitted.width;
+      const sourceHeight = fitted.height;
+
+      sourceCanvas.width = sourceWidth;
+      sourceCanvas.height = sourceHeight;
+      sourceCtx.clearRect(0, 0, sourceWidth, sourceHeight);
+      sourceCtx.imageSmoothingEnabled = true;
+      sourceCtx.imageSmoothingQuality = 'high';
+      sourceCtx.drawImage(currentImage, 0, 0, sourceWidth, sourceHeight);
+
+      const stageRect = stage.getBoundingClientRect();
+      const maxPreviewWidth = Math.max(220, Math.floor(stageRect.width - 24));
+      const maxPreviewHeight = window.innerWidth <= 768
+        ? Math.max(220, Math.floor(window.innerHeight * 0.34))
+        : 460;
+      const previewSize = fitIntoBox(sourceWidth, sourceHeight, maxPreviewWidth, maxPreviewHeight);
+      const previewWidth = previewSize.width;
+      const previewHeight = previewSize.height;
+      const cellW = previewWidth / cols;
+      const cellH = previewHeight / rows;
+      const tabSize = Math.min(cellW, cellH) * 0.18;
+
+      canvas.width = Math.max(1, Math.round(previewWidth * RENDER_SCALE));
+      canvas.height = Math.max(1, Math.round(previewHeight * RENDER_SCALE));
+      canvas.style.width = `${previewWidth}px`;
+      canvas.style.height = `${previewHeight}px`;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(RENDER_SCALE, 0, 0, RENDER_SCALE, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(sourceCanvas, 0, 0, previewWidth, previewHeight);
+
+      ctx.strokeStyle = strokeColorInput.value;
+      ctx.lineWidth = Number(strokeWidthRange.value);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 0; col < cols; col += 1) {
+          drawPiecePath(ctx, col * cellW, row * cellH, cellW, cellH, getPieceTabs(row, col), tabSize);
+          ctx.stroke();
+        }
+      }
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      canvas.style.display = 'block';
+      placeholder.style.display = 'none';
+      saveBtn.disabled = false;
+      shuffleBtn.disabled = false;
+      playBtn.disabled = false;
+    }
+
+    function setError(message) {
+      currentImage = null;
+      placeholder.textContent = message;
+      placeholder.style.display = 'block';
+      canvas.style.display = 'none';
+      saveBtn.disabled = true;
+      shuffleBtn.disabled = true;
+      playBtn.disabled = true;
+    }
+
+    function useLoadedImage(img) {
+      currentImage = img;
+      initTabs(false);
+      updateLabels();
+      renderMainPuzzle();
+    }
+
+    function loadExampleImage(src, label) {
+      placeholder.textContent = `Загрузка примера: ${label}...`;
+      placeholder.style.display = 'block';
+      canvas.style.display = 'none';
+      saveBtn.disabled = true;
+      shuffleBtn.disabled = true;
+      playBtn.disabled = true;
+
+      const img = new Image();
+      img.onload = () => useLoadedImage(img);
+      img.onerror = () => setError(`Не удалось загрузить пример: ${label}`);
+      img.src = src;
+    }
+
+    function updatePiecesStatus() {
+      const locked = playPieces.filter((piece) => piece.locked).length;
+      piecesStatus.textContent = `Собрано: ${locked} из ${playPieces.length}`;
+      winBanner.style.display = 'none';
+
+      if (locked === playPieces.length && playPieces.length > 0) {
+        winPopup.classList.add('show');
+      }
+    }
+
+    function getBoardSize() {
+      const previewSize = getPreviewDisplaySize();
+      if (previewSize) {
+        return {
+          finalWidth: previewSize.width,
+          finalHeight: previewSize.height
+        };
+      }
+
+      const fitted = fitSize(
+        currentImage.naturalWidth || currentImage.width,
+        currentImage.naturalHeight || currentImage.height,
+        2600
+      );
+      const boardMaxWidth = Math.min(window.innerWidth - 72, 960);
+      const boardMaxHeight = window.innerWidth <= 768
+        ? Math.max(220, Math.floor(window.innerHeight * 0.34))
+        : 460;
+      const boardSize = fitIntoBox(fitted.width, fitted.height, boardMaxWidth, boardMaxHeight);
+      return {
+        finalWidth: boardSize.width,
+        finalHeight: boardSize.height
+      };
+    }
+
+    function buildPieceCanvas(row, col, boardWidth, boardHeight) {
+      const cols = getCols();
+      const rows = getRows();
+
+      const sourceCellW = sourceCanvas.width / cols;
+      const sourceCellH = sourceCanvas.height / rows;
+      const sourceTabSize = Math.min(sourceCellW, sourceCellH) * 0.18;
+
+      const cellW = boardWidth / cols;
+      const cellH = boardHeight / rows;
+      const tabSize = Math.min(cellW, cellH) * 0.18;
+      const tabs = getPieceTabs(row, col);
+
+      const sourceMarginTop = tabs.top === 1 ? sourceTabSize : 0;
+      const sourceMarginRight = tabs.right === 1 ? sourceTabSize : 0;
+      const sourceMarginBottom = tabs.bottom === 1 ? sourceTabSize : 0;
+      const sourceMarginLeft = tabs.left === 1 ? sourceTabSize : 0;
+
+      const marginTop = tabs.top === 1 ? tabSize : 0;
+      const marginRight = tabs.right === 1 ? tabSize : 0;
+      const marginBottom = tabs.bottom === 1 ? tabSize : 0;
+      const marginLeft = tabs.left === 1 ? tabSize : 0;
+
+      const cssWidth = cellW + marginLeft + marginRight;
+      const cssHeight = cellH + marginTop + marginBottom;
+
+      const pieceCanvas = document.createElement('canvas');
+      pieceCanvas.width = Math.max(1, Math.round(cssWidth * RENDER_SCALE));
+      pieceCanvas.height = Math.max(1, Math.round(cssHeight * RENDER_SCALE));
+      pieceCanvas.style.width = `${cssWidth}px`;
+      pieceCanvas.style.height = `${cssHeight}px`;
+      const pctx = pieceCanvas.getContext('2d');
+      pctx.setTransform(RENDER_SCALE, 0, 0, RENDER_SCALE, 0, 0);
+
+      drawPiecePath(pctx, marginLeft, marginTop, cellW, cellH, tabs, tabSize);
+      pctx.save();
+      pctx.clip();
+      pctx.imageSmoothingEnabled = true;
+      pctx.imageSmoothingQuality = 'high';
+      pctx.drawImage(
+        sourceCanvas,
+        col * sourceCellW - sourceMarginLeft,
+        row * sourceCellH - sourceMarginTop,
+        sourceCellW + sourceMarginLeft + sourceMarginRight,
+        sourceCellH + sourceMarginTop + sourceMarginBottom,
+        0,
+        0,
+        cssWidth,
+        cssHeight
+      );
+      pctx.restore();
+
+      pctx.strokeStyle = strokeColorInput.value;
+      pctx.lineWidth = Number(strokeWidthRange.value);
+      pctx.lineCap = 'round';
+      pctx.lineJoin = 'round';
+      drawPiecePath(pctx, marginLeft, marginTop, cellW, cellH, tabs, tabSize);
+      pctx.stroke();
+      pctx.setTransform(1, 0, 0, 1, 0, 0);
+
+      return {
+        canvas: pieceCanvas,
+        width: cssWidth,
+        height: cssHeight,
+        pixelWidth: pieceCanvas.width,
+        pixelHeight: pieceCanvas.height,
+        cellW,
+        cellH,
+        marginLeft,
+        marginTop,
+        marginRight,
+        marginBottom
+      };
+    }
+
+    function rerenderPieceCanvas(piece) {
+      const rendered = buildPieceCanvas(piece.row, piece.col, currentBoardWidth, currentBoardHeight);
+      piece.width = rendered.width;
+      piece.height = rendered.height;
+      piece.cellW = rendered.cellW;
+      piece.cellH = rendered.cellH;
+      piece.marginLeft = rendered.marginLeft;
+      piece.marginTop = rendered.marginTop;
+      piece.marginRight = rendered.marginRight;
+      piece.marginBottom = rendered.marginBottom;
+      piece.targetLeft = Math.round(piece.col * rendered.cellW - rendered.marginLeft);
+      piece.targetTop = Math.round(piece.row * rendered.cellH - rendered.marginTop);
+
+      piece.el.width = rendered.pixelWidth;
+      piece.el.height = rendered.pixelHeight;
+      piece.el.style.width = `${rendered.width}px`;
+      piece.el.style.height = `${rendered.height}px`;
+      const pctx = piece.el.getContext('2d');
+      pctx.clearRect(0, 0, rendered.pixelWidth, rendered.pixelHeight);
+      pctx.drawImage(rendered.canvas, 0, 0, rendered.pixelWidth, rendered.pixelHeight);
+    }
+
+    function clearPlayArea() {
+      playPieces = [];
+      boardArea.querySelectorAll('.piece').forEach((el) => el.remove());
+      trayScroll.querySelectorAll('.piece').forEach((el) => el.remove());
+      currentBoardWidth = 0;
+      currentBoardHeight = 0;
+    }
+
+    function clampToBoard(piece, left, top) {
+      const minLeft = -piece.marginLeft;
+      const minTop = -piece.marginTop;
+      const maxLeft = boardArea.clientWidth - (piece.width - piece.marginRight);
+      const maxTop = boardArea.clientHeight - (piece.height - piece.marginBottom);
+
+      return {
+        left: Math.max(minLeft, Math.min(maxLeft, left)),
+        top: Math.max(minTop, Math.min(maxTop, top))
+      };
+    }
+
+    function layoutTrayPieces(shuffled) {
+      const isMobile = window.innerWidth <= 768;
+      const topPadding = 12;
+      const sidePadding = 14;
+      const gap = isMobile ? 14 : 18;
+      const usableHeight = Math.max(110, trayArea.clientHeight - topPadding * 2 - 18);
+      const maxPieceHeight = usableHeight * 0.82;
+
+      let x = sidePadding;
+      let contentWidth = sidePadding;
+
+      shuffled.forEach((piece) => {
+        const scaleByHeight = maxPieceHeight / Math.max(piece.height, 1);
+        const randomScaleFactor = 0.90 + Math.random() * 0.10;
+        const trayScale = Math.min(1, Math.max(0.52, scaleByHeight * randomScaleFactor));
+
+        const scaledWidth = piece.width * trayScale;
+        const scaledHeight = piece.height * trayScale;
+        const y = topPadding + Math.max(0, (usableHeight - scaledHeight) / 2);
+
+        piece.trayScale = trayScale;
+        piece.trayRotation = 0;
+        piece.trayJitterX = 0;
+        piece.trayJitterY = 0;
+        piece.trayLeft = x;
+        piece.trayTop = y;
+
+        trayScroll.appendChild(piece.el);
+        piece.el.style.position = 'absolute';
+        piece.el.style.transform = `scale(${trayScale})`;
+        piece.el.style.transformOrigin = 'top left';
+        piece.el.style.left = `${x}px`;
+        piece.el.style.top = `${y}px`;
+        piece.el.style.zIndex = '1';
+
+        x += scaledWidth + gap;
+        contentWidth = Math.max(contentWidth, x);
+      });
+
+      trayScroll.style.width = `${Math.max(trayArea.clientWidth, contentWidth + sidePadding)}px`;
+      trayScroll.style.height = '100%';
+    }
+
+    function refreshTrayLayout() {
+      const trayPieces = playPieces
+        .filter((piece) => !piece.inBoard)
+        .sort((a, b) => a.trayOrder - b.trayOrder);
+
+      trayScroll.innerHTML = '';
+      layoutTrayPieces(trayPieces);
+    }
+
+    function returnToTray(piece) {
+      piece.locked = false;
+      piece.inBoard = false;
+      piece.el.classList.remove('locked');
+      refreshTrayLayout();
+    }
+
+    function startDrag(piece, event) {
+      event.preventDefault();
+
+      if (piece.locked) {
+        piece.el.classList.remove('locked');
+        piece.locked = false;
+      }
+
+      const fromTray = piece.el.parentElement === trayScroll;
+      const startRect = piece.el.getBoundingClientRect();
+      const startScale = fromTray ? piece.trayScale : 1;
+      const offsetX = (event.clientX - startRect.left) / startScale;
+      const offsetY = (event.clientY - startRect.top) / startScale;
+
+      piece.dragOffsetX = offsetX;
+      piece.dragOffsetY = offsetY;
+
+      document.body.appendChild(piece.el);
+      piece.el.style.position = 'fixed';
+      piece.el.style.left = `${startRect.left}px`;
+      piece.el.style.top = `${startRect.top}px`;
+      piece.el.style.transform = 'scale(1)';
+      piece.el.style.transformOrigin = 'top left';
+      piece.el.style.zIndex = String(2000 + (++zCounter));
+      piece.el.setPointerCapture(event.pointerId);
+
+      function onMove(moveEvent) {
+        piece.el.style.left = `${moveEvent.clientX - offsetX}px`;
+        piece.el.style.top = `${moveEvent.clientY - offsetY}px`;
+      }
+
+      function onUp(upEvent) {
+        piece.el.releasePointerCapture(upEvent.pointerId);
+        piece.el.removeEventListener('pointermove', onMove);
+        piece.el.removeEventListener('pointerup', onUp);
+        piece.el.removeEventListener('pointercancel', onUp);
+        finishDrop(piece, upEvent.clientX, upEvent.clientY);
+      }
+
+      piece.el.addEventListener('pointermove', onMove);
+      piece.el.addEventListener('pointerup', onUp);
+      piece.el.addEventListener('pointercancel', onUp);
+    }
+
+    function finishDrop(piece, clientX, clientY) {
+      const trayRect = trayArea.getBoundingClientRect();
+      const boardRect = boardArea.getBoundingClientRect();
+
+      const overTray =
+        clientX >= trayRect.left &&
+        clientX <= trayRect.right &&
+        clientY >= trayRect.top &&
+        clientY <= trayRect.bottom;
+
+      const overBoard =
+        clientX >= boardRect.left &&
+        clientX <= boardRect.right &&
+        clientY >= boardRect.top &&
+        clientY <= boardRect.bottom;
+
+      if (overTray) {
+        returnToTray(piece);
+        updatePiecesStatus();
+        return;
+      }
+
+      boardArea.appendChild(piece.el);
+      piece.el.style.position = 'absolute';
+      piece.el.style.transform = 'scale(1)';
+      piece.el.style.transformOrigin = 'top left';
+
+      const localX = clientX - boardRect.left;
+      const localY = clientY - boardRect.top;
+      const rawLeft = localX - (piece.dragOffsetX || 0);
+      const rawTop = localY - (piece.dragOffsetY || 0);
+      const pos = clampToBoard(piece, rawLeft, rawTop);
+
+      piece.el.style.left = `${pos.left}px`;
+      piece.el.style.top = `${pos.top}px`;
+
+      const dx = pos.left - piece.targetLeft;
+      const dy = pos.top - piece.targetTop;
+      const distance = Math.hypot(dx, dy);
+      const snap = Math.max(12, Math.min(piece.cellW, piece.cellH) * 0.12);
+
+      if (overBoard && distance <= snap) {
+        piece.el.style.left = `${piece.targetLeft}px`;
+        piece.el.style.top = `${piece.targetTop}px`;
+        piece.el.classList.add('locked');
+        piece.locked = true;
+      } else {
+        piece.el.classList.remove('locked');
+        piece.locked = false;
+      }
+
+      piece.inBoard = true;
+      refreshTrayLayout();
+      updatePiecesStatus();
+    }
+
+    function createPlayPieces(boardWidth, boardHeight) {
+      clearPlayArea();
+      currentBoardWidth = boardWidth;
+      currentBoardHeight = boardHeight;
+      zCounter = 10;
+
+      const cols = getCols();
+      const rows = getRows();
+
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 0; col < cols; col += 1) {
+          const rendered = buildPieceCanvas(row, col, boardWidth, boardHeight);
+          const el = document.createElement('canvas');
+          el.width = rendered.pixelWidth;
+          el.height = rendered.pixelHeight;
+          el.className = 'piece';
+          el.style.width = `${rendered.width}px`;
+          el.style.height = `${rendered.height}px`;
+          el.getContext('2d').drawImage(rendered.canvas, 0, 0, rendered.pixelWidth, rendered.pixelHeight);
+
+          const piece = {
+            row,
+            col,
+            el,
+            width: rendered.width,
+            height: rendered.height,
+            cellW: rendered.cellW,
+            cellH: rendered.cellH,
+            marginLeft: rendered.marginLeft,
+            marginTop: rendered.marginTop,
+            marginRight: rendered.marginRight,
+            marginBottom: rendered.marginBottom,
+            targetLeft: Math.round(col * rendered.cellW - rendered.marginLeft),
+            targetTop: Math.round(row * rendered.cellH - rendered.marginTop),
+            trayLeft: 0,
+            trayTop: 0,
+            trayScale: 0.48,
+            trayRotation: 0,
+            trayJitterX: 0,
+            trayJitterY: 0,
+            trayOrder: 0,
+            locked: false,
+            inBoard: false,
+            dragOffsetX: 0,
+            dragOffsetY: 0
+          };
+
+          el.addEventListener('pointerdown', (event) => startDrag(piece, event));
+          playPieces.push(piece);
+        }
+      }
+
+      const shuffled = shuffleArray(playPieces);
+      shuffled.forEach((piece, index) => {
+        piece.trayOrder = index;
+      });
+
+      layoutTrayPieces(shuffled);
+      updatePiecesStatus();
+    }
+
+    function applyBoardSizeAndSync() {
+      if (!currentImage || !playModal.classList.contains('open')) return;
+
+      const { finalWidth, finalHeight } = getBoardSize();
+
+      const oldWidth = currentBoardWidth || finalWidth;
+      const oldHeight = currentBoardHeight || finalHeight;
+      const scaleX = oldWidth > 0 ? finalWidth / oldWidth : 1;
+      const scaleY = oldHeight > 0 ? finalHeight / oldHeight : 1;
+
+      boardArea.style.width = `${finalWidth}px`;
+      boardArea.style.height = `${finalHeight}px`;
+      boardSilhouette.style.backgroundImage = 'none';
+
+      if (playPieces.length === 0) {
+        createPlayPieces(finalWidth, finalHeight);
+        return;
+      }
+
+      currentBoardWidth = finalWidth;
+      currentBoardHeight = finalHeight;
+
+      playPieces.forEach((piece) => {
+        const oldTargetLeft = piece.targetLeft;
+        const oldTargetTop = piece.targetTop;
+        const oldBoardLeft = piece.inBoard ? parseFloat(piece.el.style.left || '0') : 0;
+        const oldBoardTop = piece.inBoard ? parseFloat(piece.el.style.top || '0') : 0;
+        const wasLocked = piece.locked;
+        const wasInBoard = piece.inBoard;
+
+        rerenderPieceCanvas(piece);
+
+        if (wasInBoard) {
+          boardArea.appendChild(piece.el);
+          piece.el.style.position = 'absolute';
+          piece.el.style.transform = 'scale(1)';
+          piece.el.style.transformOrigin = 'top left';
+
+          if (wasLocked) {
+            piece.el.style.left = `${piece.targetLeft}px`;
+            piece.el.style.top = `${piece.targetTop}px`;
+            piece.el.classList.add('locked');
+          } else {
+            const relativeX = oldTargetLeft !== 0 || oldBoardLeft !== 0
+              ? (oldBoardLeft - oldTargetLeft)
+              : 0;
+            const relativeY = oldTargetTop !== 0 || oldBoardTop !== 0
+              ? (oldBoardTop - oldTargetTop)
+              : 0;
+
+            const newLeft = piece.targetLeft + relativeX * scaleX;
+            const newTop = piece.targetTop + relativeY * scaleY;
+            const clamped = clampToBoard(piece, newLeft, newTop);
+
+            piece.el.style.left = `${clamped.left}px`;
+            piece.el.style.top = `${clamped.top}px`;
+            piece.el.classList.remove('locked');
+          }
+        }
+      });
+
+      refreshTrayLayout();
+      updatePiecesStatus();
+    }
+
+    function openPlayModal() {
+      if (!currentImage) return;
+
+      playModal.classList.add('open');
+      clearPlayArea();
+
+      requestAnimationFrame(() => {
+        applyBoardSizeAndSync();
+      });
+    }
+
+    function closePlayModal() {
+      playModal.classList.remove('open');
+      clearPlayArea();
+    }
+
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (loadEvent) => {
+        const src = loadEvent.target && loadEvent.target.result;
+        if (!src) {
+          setError('Не удалось прочитать изображение');
+          return;
+        }
+        const img = new Image();
+        img.onload = () => useLoadedImage(img);
+        img.onerror = () => setError('Не удалось загрузить изображение');
+        img.src = src;
+      };
+      reader.onerror = () => setError('Ошибка чтения файла');
+      reader.readAsDataURL(file);
+      fileInput.value = '';
+    });
+
+    colsRange.addEventListener('input', () => {
+      updateLabels();
+      initTabs(false);
+      renderMainPuzzle();
+    });
+
+    rowsRange.addEventListener('input', () => {
+      updateLabels();
+      initTabs(false);
+      renderMainPuzzle();
+    });
+
+    strokeWidthRange.addEventListener('input', () => {
+      updateLabels();
+      renderMainPuzzle();
+    });
+
+    strokeColorInput.addEventListener('input', () => {
+      updateLabels();
+      renderMainPuzzle();
+    });
+
+    shuffleBtn.addEventListener('click', () => {
+      if (!currentImage) return;
+      initTabs(true);
+      renderMainPuzzle();
+
+      if (playModal.classList.contains('open')) {
+        const shuffled = shuffleArray(playPieces);
+        shuffled.forEach((piece, index) => {
+          piece.trayOrder = index;
+        });
+        applyBoardSizeAndSync();
+      }
+    });
+
+    playBtn.addEventListener('click', openPlayModal);
+    closeModalBtn.addEventListener('click', closePlayModal);
+
+    reshufflePlayBtn.addEventListener('click', () => {
+      if (!currentImage) return;
+
+      const freePieces = playPieces.filter((piece) => !piece.inBoard);
+      const shuffled = shuffleArray(freePieces);
+
+      shuffled.forEach((piece, index) => {
+        piece.trayOrder = index;
+      });
+
+      refreshTrayLayout();
+    });
+
+
+    playModal.addEventListener('click', (event) => {
+      if (event.target === playModal) closePlayModal();
+    });
+
+    closeWinBtn.onclick = () => {
+      winPopup.classList.remove('show');
+    };
+
+    restartWinBtn.onclick = () => {
+      winPopup.classList.remove('show');
+
+      if (!currentImage) return;
+
+      const { finalWidth, finalHeight } = getBoardSize();
+      boardArea.style.width = `${finalWidth}px`;
+      boardArea.style.height = `${finalHeight}px`;
+      createPlayPieces(finalWidth, finalHeight);
+    };
+
+    trayArea.addEventListener('wheel', (event) => {
+      if (Math.abs(event.deltaY) >= Math.abs(event.deltaX)) {
+        event.preventDefault();
+        trayArea.scrollLeft += event.deltaY;
+      }
+    }, { passive: false });
+
+    window.addEventListener('resize', () => {
+      if (!playModal.classList.contains('open')) return;
+
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        applyBoardSizeAndSync();
+      }, 80);
+    });
+
+    saveBtn.addEventListener('click', () => {
+      if (!currentImage) return;
+      const link = document.createElement('a');
+      link.download = 'puzzle.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+
+    exampleCards.forEach((card) => {
+      card.addEventListener('click', () => loadExampleImage(card.dataset.src, card.dataset.label));
+    });
+
+    updateLabels();
+    initTabs(false);
+  </script>
+</body>
+</html>
