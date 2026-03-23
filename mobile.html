@@ -650,20 +650,34 @@
 
       .action-row {
         grid-column: 1 / -1;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 6px;
       }
 
       .compact-control {
-        min-height: 52px;
+        min-height: 58px;
         padding: 6px 8px;
       }
 
-      .compact-control .control-label,
-      .compact-control strong {
-        font-size: 11px;
+      .compact-control .control-top {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 2px;
       }
 
+      .compact-control .control-label {
+        white-space: normal;
+        line-height: 1.15;
+        font-size: 10px;
+      }
+
+      .compact-control strong {
+        font-size: 11px;
+        align-self: flex-end;
+      }
+      
       .btn,
       label.btn {
         font-size: 12px;
