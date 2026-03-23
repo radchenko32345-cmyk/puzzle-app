@@ -67,7 +67,7 @@
     .action-row {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       align-items: stretch;
     }
@@ -518,8 +518,8 @@
       }
 
       .controls {
-        grid-template-columns: repeat(6, minmax(0, 1fr));
-        gap: 8px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
       }
 
       .control-size,
@@ -530,7 +530,7 @@
       }
 
       .action-row {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 6px;
       }
 
@@ -653,16 +653,15 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
       }
-    }
 
       .compact-control {
-        min-height: 34px;
-        padding: 6px 7px;
+        min-height: 52px;
+        padding: 6px 8px;
       }
 
       .compact-control .control-label,
       .compact-control strong {
-        font-size: 10px;
+        font-size: 11px;
       }
 
       .btn,
@@ -680,8 +679,7 @@
         font-size: 11px;
         padding: 6px;
       }
-    }
-  
+    }  
 
     .game-modal .modal-content {
       padding: 0;
@@ -837,6 +835,11 @@
         margin-bottom: 12px;
       }
 
+      .control-label {
+        white-space: normal;
+        line-height: 1.2;
+      }
+
       .control-size,
       .control-stroke,
       .control-color,
@@ -845,7 +848,7 @@
       }
 
       .compact-control {
-        min-height: 36px;
+        min-height: 60px;
         padding: 6px 8px;
         border-radius: 12px;
         gap: 6px 8px;
@@ -939,14 +942,14 @@
 <input accept="image/*" id="fileInput" type="file"/>
 <div class="compact-control control-size">
 <div class="control-top">
-<span class="control-label">Горизонталь</span>
+<span class="control-label">Кол-во кусочков по горизонтали</span>
 <strong id="colsValue">4</strong>
 </div>
 <input id="colsRange" max="8" min="2" type="range" value="4"/>
 </div>
 <div class="compact-control control-size">
 <div class="control-top">
-<span class="control-label">Вертикаль</span>
+<span class="control-label">Кол-во кусочков по вертикали</span>
 <strong id="rowsValue">4</strong>
 </div>
 <input id="rowsRange" max="8" min="2" type="range" value="4"/>
@@ -954,9 +957,9 @@
 <div class="compact-control control-stroke">
 <div class="control-top">
 <span class="control-label">Контур</span>
-<strong id="strokeWidthValue">1.4</strong>
+<strong id="strokeWidthValue">1</strong>
 </div>
-<input id="strokeWidthRange" max="6" min="1" step="0.1" type="range" value="1.4"/>
+<input id="strokeWidthRange" max="6" min="1" step="0.1" type="range" value="1"/>
 </div>
 <div class="compact-control control-color">
 <div class="control-top">
@@ -967,7 +970,6 @@
 </div>
 <div class="action-row">
 <button class="btn save" disabled="" id="saveBtn">Сохранить пазл</button>
-<button class="btn secondary" disabled="" id="shuffleBtn">Поменять</button>
 <label class="btn" for="fileInput">Выбрать фото</label>
 <button class="btn play" disabled="" id="playBtn">Играть</button>
 </div>
@@ -1037,7 +1039,6 @@
 <script>
     const fileInput = document.getElementById('fileInput');
     const saveBtn = document.getElementById('saveBtn');
-    const shuffleBtn = document.getElementById('shuffleBtn');
     const playBtn = document.getElementById('playBtn');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -1243,7 +1244,6 @@
       canvas.style.display = 'block';
       placeholder.style.display = 'none';
       saveBtn.disabled = false;
-      shuffleBtn.disabled = false;
       playBtn.disabled = false;
     }
 
@@ -1253,7 +1253,6 @@
       placeholder.style.display = 'block';
       canvas.style.display = 'none';
       saveBtn.disabled = true;
-      shuffleBtn.disabled = true;
       playBtn.disabled = true;
     }
 
@@ -1269,7 +1268,6 @@
       placeholder.style.display = 'block';
       canvas.style.display = 'none';
       saveBtn.disabled = true;
-      shuffleBtn.disabled = true;
       playBtn.disabled = true;
 
       const img = new Image();
@@ -1773,21 +1771,7 @@
       updateLabels();
       renderMainPuzzle();
     });
-
-    shuffleBtn.addEventListener('click', () => {
-      if (!currentImage) return;
-      initTabs(true);
-      renderMainPuzzle();
-
-      if (playModal.classList.contains('open')) {
-        const shuffled = shuffleArray(playPieces);
-        shuffled.forEach((piece, index) => {
-          piece.trayOrder = index;
-        });
-        applyBoardSizeAndSync();
-      }
-    });
-
+  
     playBtn.addEventListener('click', openPlayModal);
     closeModalBtn.addEventListener('click', closePlayModal);
 
