@@ -162,36 +162,7 @@
       color:var(--text);
       border:1px solid var(--line);
     }
-
-    .bottom{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-      border-top:1px solid rgba(255,255,255,0.08);
-      padding-top:16px;
-    }
-
-    .hint{
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.5;
-    }
-
-    .auto-btn{
-      border:none;
-      cursor:pointer;
-      min-height:42px;
-      padding:10px 14px;
-      border-radius:14px;
-      font-size:14px;
-      font-weight:700;
-      background:var(--btn-alt);
-      color:var(--text);
-      border:1px solid var(--line);
-    }
-
+    
     .footer-note{
       text-align:center;
       color:rgba(255,255,255,0.5);
@@ -270,26 +241,11 @@
           <span class="go">Открыть мобильную версию</span>
         </a>
       </div>
-
-      <div class="bottom">
-        <div class="hint">
-          Можно также открыть версию автоматически по ширине экрана.
-        </div>
-        <button class="auto-btn" onclick="goAuto()">Определить автоматически</button>
-      </div>
+      
     </div>
 
     <div class="footer-note">Puzzle App</div>
   </div>
 
-  <script>
-    function goAuto() {
-      if (window.innerWidth <= 768) {
-        window.location.href = "mobile.html";
-      } else {
-        window.location.href = "pc.html";
-      }
-    }
-  </script>
 </body>
 </html>
