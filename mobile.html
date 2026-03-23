@@ -67,7 +67,7 @@
     .action-row {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
       align-items: stretch;
     }
@@ -141,10 +141,6 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 2px;
-    }
-
-    .control-save {
-      grid-column: span 3;
     }
 
     .btn, label.btn {
@@ -534,7 +530,8 @@
       }
 
       .action-row {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
       }
 
       .btn,
@@ -967,8 +964,8 @@
 </div>
 <input id="strokeColorInput" type="color" value="#ffffff"/>
 </div>
-<button class="btn save control-save" disabled="" id="saveBtn">Сохранить пазл</button>
 <div class="action-row">
+<button class="btn save" disabled="" id="saveBtn">Сохранить пазл</button>
 <button class="btn secondary" disabled="" id="shuffleBtn">Поменять</button>
 <label class="btn" for="fileInput">Выбрать фото</label>
 <button class="btn play" disabled="" id="playBtn">Играть</button>
