@@ -843,8 +843,9 @@
       }
 
       .toolbar-score {
-        font-size: 24px;
-      }
+        font-size: 16px;
+        padding: 6px 10px;
+       }
 
       .board-wrap-reference {
         padding: 22px 22px 10px;
@@ -886,9 +887,9 @@
 <div class="compact-control control-stroke">
 <div class="control-top">
 <span class="control-label">Контур</span>
-<strong id="strokeWidthValue">2</strong>
+<strong id="strokeWidthValue">1.4</strong>
 </div>
-<input id="strokeWidthRange" max="6" min="1" step="0.2" type="range" value="2"/>
+<input id="strokeWidthRange" max="6" min="1" step="0.1" type="range" value="1.4"/>
 </div>
 <div class="compact-control control-color">
 <div class="control-top">
@@ -938,7 +939,6 @@
 <div class="game-toolbar">
 <button aria-label="Назад" class="toolbar-btn icon-btn" id="closeModalBtn">←</button>
 <button aria-label="Перемешать" class="toolbar-btn icon-btn" id="reshufflePlayBtn">⇄</button>
-<button aria-label="Контур" class="toolbar-btn icon-btn" type="button">▨</button>
 <div class="toolbar-score" id="piecesStatus">0</div>
 <button aria-label="Подсказка" class="toolbar-btn icon-btn" type="button"></button>
 <button aria-label="Выделить" class="toolbar-btn icon-btn" type="button">⛶</button>
@@ -1216,7 +1216,7 @@
 
     function updatePiecesStatus() {
       const locked = playPieces.filter((piece) => piece.locked).length;
-      piecesStatus.textContent = `Собрано: ${locked} из ${playPieces.length}`;
+      piecesStatus.textContent = `${locked}/${playPieces.length}`;
       winBanner.style.display = 'none';
 
       if (locked === playPieces.length && playPieces.length > 0) {
