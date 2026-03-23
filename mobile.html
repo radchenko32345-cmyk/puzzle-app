@@ -631,60 +631,56 @@
     }
 
     @media (max-width: 480px) {
-      h1 {
-        font-size: 21px;
-      }
-
       .app {
-        padding: 12px;
-      }
-
-      .preview-wrap {
-        padding: 12px;
-      }
-
-      .stage {
-        min-height: 180px;
         padding: 8px;
       }
 
-      .tray-area {
-        height: 100%;
-        min-height: 140px;
-      }
-
-      .modal-title {
+      h1 {
         font-size: 20px;
       }
 
-      .modal-subtitle {
-        font-size: 13px;
-      }
-
-      .btn,
-      label.btn {
-        font-size: 13px;
-        padding: 10px 12px;
-      }
-
       .controls {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 6px;
       }
 
       .control-size,
       .control-stroke,
       .control-color,
-      .control-save,
+      .control-save {
+        grid-column: span 3;
+      }
+
       .action-row {
         grid-column: 1 / -1;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
       }
 
       .compact-control {
-        grid-template-columns: minmax(0, 1fr) auto;
+        min-height: 34px;
+        padding: 6px 7px;
       }
 
-      .examples-grid {
-        grid-template-columns: 1fr;
+      .compact-control .control-label,
+      .compact-control strong {
+        font-size: 10px;
+      }
+
+      .btn,
+      label.btn {
+        font-size: 12px;
+        padding: 8px;
+        min-height: 36px;
+      }
+
+      .example-card img {
+        height: 64px;
+      }
+
+      .example-card div {
+        font-size: 11px;
+        padding: 6px;
       }
     }
   
@@ -701,7 +697,7 @@
       background: linear-gradient(180deg, #111111, #161616);
       border-bottom: 1px solid rgba(255,255,255,0.08);
       display: grid;
-      grid-template-columns: repeat(3, 48px) 1fr repeat(3, 48px);
+      grid-template-columns: 48px 48px 1fr;
       align-items: center;
       gap: 10px;
       padding: 0 18px;
@@ -819,46 +815,119 @@
 
     @media (max-width: 768px) {
       body {
-        padding: 0;
-        background: #090909;
+        padding: 8px;
       }
 
       .app {
-        border-radius: 0;
-        border: none;
-        box-shadow: none;
-        min-height: 100vh;
+        padding: 10px;
+        border-radius: 16px;
       }
 
-      .game-toolbar {
-        padding: 0 14px;
-        grid-template-columns: repeat(3, 42px) 1fr repeat(3, 42px);
+      h1 {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+
+      p {
+        font-size: 13px;
+        margin-bottom: 12px;
+      }
+
+      .controls {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+
+      .control-size,
+      .control-stroke,
+      .control-color,
+      .control-save {
+        grid-column: span 3;
+      }
+
+      .compact-control {
+        min-height: 36px;
+        padding: 6px 8px;
+        border-radius: 12px;
+        gap: 6px 8px;
+      }
+
+      .compact-control .control-label {
+        font-size: 11px;
+      }
+    
+      .compact-control strong {
+        font-size: 11px;
+      }
+
+      .compact-control input[type="range"] {
+        height: 18px;
+      }
+
+      .compact-control input[type="color"] {
+        width: 30px;
+        height: 24px;
+      }
+    
+      .btn,
+      label.btn {
+        min-height: 38px;
+        font-size: 13px;
+        padding: 8px 10px;
+        border-radius: 12px;
+      }
+
+      .action-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .preview-wrap {
+        padding: 10px;
+        margin-bottom: 12px;
+        border-radius: 16px;
+      }
+
+      .section-title {
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+
+      .stage {
+        min-height: 160px;
+        padding: 8px;
+      }
+
+      .examples-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 8px;
       }
 
-      .toolbar-btn {
-        width: 38px;
-        height: 38px;
-        font-size: 26px;
+      .example-card {
+        border-radius: 14px;
       }
 
-      .toolbar-score {
-        font-size: 16px;
-        padding: 6px 10px;
-       }
-
-      .board-wrap-reference {
-        padding: 22px 22px 10px;
+      .example-card img {
+        height: 74px;
       }
 
-      .board-wrap-reference .board-area {
-        max-width: calc(100vw - 44px);
-        max-height: calc(100vh - 72px - 170px - 34px);
+      .example-card div {
+        padding: 8px;
+        font-size: 12px;
       }
 
-      .tray-wrap-reference {
-        flex-basis: 170px;
-        min-height: 170px;
+      .footer-note {
+        font-size: 11px;
+        line-height: 1.4;
+        margin-top: 14px;
+      }
+
+      .app-version {
+        font-size: 11px;
+        padding: 4px 7px;
+        right: 8px;
+        bottom: 8px;
       }
     }
 
@@ -940,9 +1009,6 @@
 <button aria-label="Назад" class="toolbar-btn icon-btn" id="closeModalBtn">←</button>
 <button aria-label="Перемешать" class="toolbar-btn icon-btn" id="reshufflePlayBtn">⇄</button>
 <div class="toolbar-score" id="piecesStatus">0</div>
-<button aria-label="Подсказка" class="toolbar-btn icon-btn" type="button"></button>
-<button aria-label="Выделить" class="toolbar-btn icon-btn" type="button">⛶</button>
-<button aria-label="Показать" class="toolbar-btn icon-btn" type="button">◉</button>
 </div>
 <div class="play-layout mobile-reference-layout">
 <div class="board-wrap board-wrap-reference">
@@ -969,7 +1035,7 @@
 </div>
 </div>
 </div>
-<div class="app-version">Версия 0.69</div>
+<div class="app-version">Версия 1</div>
 <script>
     const fileInput = document.getElementById('fileInput');
     const saveBtn = document.getElementById('saveBtn');
