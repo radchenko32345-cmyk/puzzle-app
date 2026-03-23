@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Puzzle App — выбор версии</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <style>
+    :root{
+      --bg1:#050505;
+      --bg2:#111111;
+      --panel:#111111;
+      --panel-2:#171717;
+      --line:rgba(255,255,255,0.12);
+      --text:#ffffff;
+      --muted:rgba(255,255,255,0.68);
+      --btn:#ffffff;
+      --btn-text:#000000;
+      --btn-alt:#222222;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.05), transparent 22%),
+        radial-gradient(circle at bottom right, rgba(255,255,255,0.04), transparent 24%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+
+    .shell{
+      width:min(760px,100%);
+    }
+
+    .card{
+      background:linear-gradient(180deg,var(--panel),var(--panel-2));
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:28px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.38);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:auto -80px -80px auto;
+      width:220px;
+      height:220px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,0.06), transparent 70%);
+      pointer-events:none;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-height:34px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      color:var(--muted);
+      background:rgba(255,255,255,0.03);
+      font-size:13px;
+      margin-bottom:14px;
+    }
+
+    h1{
+      margin:0 0 10px;
+      font-size:34px;
+      line-height:1.08;
+      letter-spacing:-0.02em;
+    }
+
+    .subtitle{
+      margin:0 0 22px;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.55;
+      max-width:620px;
+    }
+
+    .choices{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+      margin-bottom:16px;
+    }
+
+    .choice{
+      display:block;
+      text-decoration:none;
+      color:var(--text);
+      background:rgba(255,255,255,0.03);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:18px;
+      transition:transform .18s ease, border-color .18s ease, background .18s ease, box-shadow .18s ease;
+      min-height:190px;
+      position:relative;
+    }
+
+    .choice:hover{
+      transform:translateY(-2px);
+      border-color:rgba(255,255,255,0.24);
+      background:rgba(255,255,255,0.05);
+      box-shadow:0 12px 30px rgba(0,0,0,0.25);
+    }
+
+    .icon{
+      width:54px;
+      height:54px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:16px;
+      background:rgba(255,255,255,0.07);
+      border:1px solid rgba(255,255,255,0.1);
+      font-size:26px;
+    }
+
+    .choice-title{
+      font-size:22px;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+
+    .choice-text{
+      color:var(--muted);
+      line-height:1.5;
+      font-size:14px;
+      margin-bottom:18px;
+    }
+
+    .go{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:10px 14px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:700;
+      background:var(--btn);
+      color:var(--btn-text);
+    }
+
+    .choice.secondary .go{
+      background:var(--btn-alt);
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .bottom{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      border-top:1px solid rgba(255,255,255,0.08);
+      padding-top:16px;
+    }
+
+    .hint{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .auto-btn{
+      border:none;
+      cursor:pointer;
+      min-height:42px;
+      padding:10px 14px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:700;
+      background:var(--btn-alt);
+      color:var(--text);
+      border:1px solid var(--line);
+    }
+
+    .footer-note{
+      text-align:center;
+      color:rgba(255,255,255,0.5);
+      font-size:12px;
+      margin-top:12px;
+    }
+
+    @media (max-width: 700px){
+      body{ padding:12px; }
+      .card{
+        padding:18px;
+        border-radius:22px;
+      }
+      h1{
+        font-size:27px;
+      }
+      .subtitle{
+        font-size:14px;
+        margin-bottom:16px;
+      }
+      .choices{
+        grid-template-columns:1fr;
+        gap:10px;
+      }
+      .choice{
+        min-height:auto;
+        padding:15px;
+        border-radius:18px;
+      }
+      .icon{
+        width:48px;
+        height:48px;
+        border-radius:14px;
+        margin-bottom:12px;
+      }
+      .choice-title{
+        font-size:20px;
+      }
+      .bottom{
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .auto-btn{
+        width:100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <div class="badge">Puzzle App • выбор версии</div>
+
+      <h1>Выберите версию приложения</h1>
+      <p class="subtitle">
+        Нажмите на нужную платформу. Версия для ПК подходит для большого экрана и мыши,
+        а версия для телефона — для сенсорного управления и компактного интерфейса.
+      </p>
+
+      <div class="choices">
+        <a class="choice" href="pc.html">
+          <div class="icon">🖥️</div>
+          <div class="choice-title">Версия для ПК</div>
+          <div class="choice-text">
+            Большое поле, удобная работа мышью, интерфейс для настольного экрана.
+          </div>
+          <span class="go">Открыть ПК-версию</span>
+        </a>
+
+        <a class="choice secondary" href="mobile.html">
+          <div class="icon">📱</div>
+          <div class="choice-title">Версия для телефона</div>
+          <div class="choice-text">
+            Компактный интерфейс, адаптация под сенсорное управление и экран смартфона.
+          </div>
+          <span class="go">Открыть мобильную версию</span>
+        </a>
+      </div>
+
+      <div class="bottom">
+        <div class="hint">
+          Можно также открыть версию автоматически по ширине экрана.
+        </div>
+        <button class="auto-btn" onclick="goAuto()">Определить автоматически</button>
+      </div>
+    </div>
+
+    <div class="footer-note">Puzzle App</div>
+  </div>
+
+  <script>
+    function goAuto() {
+      if (window.innerWidth <= 768) {
+        window.location.href = "mobile.html";
+      } else {
+        window.location.href = "pc.html";
+      }
+    }
+  </script>
+</body>
+</html>
