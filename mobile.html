@@ -530,8 +530,12 @@
       }
 
       .action-row {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
+      }
+
+      .choose-photo-btn {
+        grid-column: 1 / -1;
       }
 
       .btn,
@@ -575,8 +579,8 @@
       }
 
       .play-layout {
-        height: calc(100vh - 122px);
-        gap: 12px;
+        height: calc(100dvh - 112px);
+        gap: 8px;
       }
 
       .board-wrap,
@@ -650,8 +654,12 @@
 
       .action-row {
         grid-column: 1 / -1;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
+      }
+
+      .choose-photo-btn {
+        grid-column: 1 / -1;
       }
 
       .compact-control {
@@ -697,6 +705,9 @@
 
     .game-modal .modal-content {
       padding: 0;
+      width: 100vw;
+      height: 100dvh;
+      min-height: 100dvh;
       background: linear-gradient(180deg, #090909, #141414);
       color: #ffffff;
       overflow: hidden;
@@ -707,43 +718,50 @@
       background: linear-gradient(180deg, #111111, #161616);
       border-bottom: 1px solid rgba(255,255,255,0.08);
       display: grid;
-      grid-template-columns: 48px 48px 1fr;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
       gap: 10px;
-      padding: 0 18px;
+      padding: 0 14px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.06);
       position: relative;
       z-index: 5;
     }
 
     .toolbar-btn {
-      width: 40px;
+      min-width: 40px;
       height: 40px;
+      padding: 0 14px;
       border: 1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.04);
       color: #ffffff;
-      font-size: 29px;
+      font-size: 18px;
+      font-weight: 700;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       border-radius: 12px;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .toolbar-score {
       justify-self: center;
-      font-size: 20px;
+      text-align: center;
+      font-size: 18px;
       font-weight: 800;
+      line-height: 1.2;
       color: #ffffff;
       text-shadow: none;
-      padding: 8px 14px;
+      padding: 8px 16px;
       border-radius: 999px;
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.08);
+      min-width: 124px;
     }
 
     .mobile-reference-layout {
-      height: calc(100vh - 72px);
+      height: calc(100dvh - 72px);
+      min-height: calc(100dvh - 72px);
       padding: 0;
       gap: 0;
       background: linear-gradient(180deg, #090909, #141414);
@@ -755,7 +773,7 @@
       border-radius: 0;
       flex: 1 1 auto;
       width: 100%;
-      padding: 24px 24px 12px;
+      padding: 10px 12px 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -774,8 +792,8 @@
       border-radius: 0;
       box-shadow: none;
       margin: 0 auto;
-      max-width: calc(100vw - 48px);
-      max-height: calc(100vh - 72px - 180px - 36px);
+      max-width: 100%;
+      max-height: 100%;
     }
 
     .tray-wrap-reference {
@@ -783,19 +801,19 @@
       border: none;
       border-top: 1px solid rgba(255,255,255,0.08);
       border-radius: 0;
-      flex: 0 0 165px;
-      min-height: 165px;
-      padding: 14px 0 18px;
+      flex: 0 0 146px;
+      min-height: 146px;
+      padding: 2px 0 6px;
       box-shadow: 0 -4px 18px rgba(0,0,0,0.04);
     }
 
     .tray-wrap-reference .tray-area {
-      min-height: 120px;
-      height: 120px;
+      min-height: 126px;
+      height: 126px;
       border: none;
       border-radius: 0;
       background: transparent;
-      padding: 8px 18px 16px;
+      padding: 0 12px 10px;
       overflow-x: auto;
       overflow-y: hidden;
       scrollbar-width: auto;
@@ -813,10 +831,10 @@
     }
 
     .tray-wrap-reference .tray-scroll {
-      min-height: 100px;
-      align-items: center;
-      gap: 20px;
-      padding-right: 18px;
+      min-height: 112px;
+      align-items: flex-start;
+      gap: 14px;
+      padding-right: 12px;
     }
 
     .tray-wrap-reference .piece {
@@ -983,8 +1001,8 @@
 <input id="strokeColorInput" type="color" value="#ffffff"/>
 </div>
 <div class="action-row">
+<label class="btn choose-photo-btn" for="fileInput">Выбрать фото</label>
 <button class="btn save" disabled="" id="saveBtn">Сохранить пазл</button>
-<label class="btn" for="fileInput">Выбрать фото</label>
 <button class="btn play" disabled="" id="playBtn">Играть</button>
 </div>
 </div>
@@ -1020,9 +1038,9 @@
 <div class="modal game-modal" id="playModal">
 <div class="modal-content game-modal-content">
 <div class="game-toolbar">
-<button aria-label="Назад" class="toolbar-btn icon-btn" id="closeModalBtn">←</button>
+<button aria-label="Выход" class="toolbar-btn icon-btn" id="closeModalBtn">Выход</button>
+<div class="toolbar-score" id="piecesStatus">Собрано<br>0/0</div>
 <button aria-label="Перемешать" class="toolbar-btn icon-btn" id="reshufflePlayBtn">⇄</button>
-<div class="toolbar-score" id="piecesStatus">0</div>
 </div>
 <div class="play-layout mobile-reference-layout">
 <div class="board-wrap board-wrap-reference">
@@ -1074,6 +1092,7 @@
     const reshufflePlayBtn = document.getElementById('reshufflePlayBtn');
     const boardArea = document.getElementById('boardArea');
     const boardSilhouette = document.getElementById('boardSilhouette');
+    const boardWrap = boardArea.closest('.board-wrap');
     const trayArea = document.getElementById('trayArea');
     const trayScroll = document.getElementById('trayScroll');
     const piecesStatus = document.getElementById('piecesStatus');
@@ -1144,6 +1163,37 @@
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
       return arr;
+    }
+
+    function shufflePiecesForTray(pieces) {
+      const shuffled = shuffleArray(pieces);
+      if (shuffled.length < 3) {
+        return shuffled;
+      }
+
+      const originalIndex = new Map(
+        pieces.map((piece, index) => [piece, piece.row * getCols() + piece.col])
+      );
+
+      for (let pass = 0; pass < 6; pass += 1) {
+        for (let i = 1; i < shuffled.length; i += 1) {
+          const prev = originalIndex.get(shuffled[i - 1]);
+          const current = originalIndex.get(shuffled[i]);
+          if (prev == null || current == null) continue;
+
+          const areNeighborsInImage = Math.abs(prev - current) <= 1;
+          if (!areNeighborsInImage) continue;
+
+          const swapIndex = Math.min(
+            shuffled.length - 1,
+            i + 1 + Math.floor(Math.random() * Math.max(1, shuffled.length - i - 1))
+          );
+
+          [shuffled[i], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[i]];
+        }
+      }
+
+      return shuffled;
     }
 
     function initTabs(randomize = false) {
@@ -1292,7 +1342,7 @@
 
     function updatePiecesStatus() {
       const locked = playPieces.filter((piece) => piece.locked).length;
-      piecesStatus.textContent = `${locked}/${playPieces.length}`;
+      piecesStatus.innerHTML = `Собрано<br>${locked}/${playPieces.length}`;
       winBanner.style.display = 'none';
 
       if (locked === playPieces.length && playPieces.length > 0) {
@@ -1301,6 +1351,40 @@
     }
 
     function getBoardSize() {
+      const fitted = fitSize(
+        currentImage.naturalWidth || currentImage.width,
+        currentImage.naturalHeight || currentImage.height,
+        2600
+      );
+
+      const isPlayModalOpen = playModal.classList.contains('open');
+      const isMobile = window.innerWidth <= 768;
+
+      if (isPlayModalOpen && isMobile && boardWrap) {
+        const wrapStyles = window.getComputedStyle(boardWrap);
+        const availableWidth = Math.max(
+          220,
+          Math.floor(
+            boardWrap.clientWidth -
+            parseFloat(wrapStyles.paddingLeft || '0') -
+            parseFloat(wrapStyles.paddingRight || '0')
+          )
+        );
+        const availableHeight = Math.max(
+          220,
+          Math.floor(
+            boardWrap.clientHeight -
+            parseFloat(wrapStyles.paddingTop || '0') -
+            parseFloat(wrapStyles.paddingBottom || '0')
+          )
+        );
+        const boardSize = fitIntoBox(fitted.width, fitted.height, availableWidth, availableHeight);
+        return {
+          finalWidth: boardSize.width,
+          finalHeight: boardSize.height
+        };
+      }
+
       const previewSize = getPreviewDisplaySize();
       if (previewSize) {
         return {
@@ -1309,14 +1393,9 @@
         };
       }
 
-      const fitted = fitSize(
-        currentImage.naturalWidth || currentImage.width,
-        currentImage.naturalHeight || currentImage.height,
-        2600
-      );
       const boardMaxWidth = Math.min(window.innerWidth - 72, 960);
-      const boardMaxHeight = window.innerWidth <= 768
-        ? Math.max(220, Math.floor(window.innerHeight * 0.34))
+      const boardMaxHeight = isMobile
+        ? Math.max(220, Math.floor(window.innerHeight * 0.5))
         : 460;
       const boardSize = fitIntoBox(fitted.width, fitted.height, boardMaxWidth, boardMaxHeight);
       return {
@@ -1444,19 +1523,19 @@
 
     function layoutTrayPieces(shuffled) {
       const isMobile = window.innerWidth <= 768;
-      const topPadding = 12;
-      const sidePadding = 14;
-      const gap = isMobile ? 14 : 18;
-      const usableHeight = Math.max(110, trayArea.clientHeight - topPadding * 2 - 18);
-      const maxPieceHeight = usableHeight * 0.82;
+      const topPadding = isMobile ? 6 : 12;
+      const sidePadding = isMobile ? 10 : 14;
+      const gap = isMobile ? 18 : 18;
+      const usableHeight = Math.max(118, trayArea.clientHeight - topPadding * 2 - (isMobile ? 10 : 18));
+      const maxPieceHeight = usableHeight * (isMobile ? 0.9 : 0.82);
 
       let x = sidePadding;
       let contentWidth = sidePadding;
 
       shuffled.forEach((piece) => {
         const scaleByHeight = maxPieceHeight / Math.max(piece.height, 1);
-        const randomScaleFactor = 0.90 + Math.random() * 0.10;
-        const trayScale = Math.min(1, Math.max(0.52, scaleByHeight * randomScaleFactor));
+        const randomScaleFactor = isMobile ? (0.96 + Math.random() * 0.08) : (0.90 + Math.random() * 0.10);
+        const trayScale = Math.min(1, Math.max(isMobile ? 0.62 : 0.52, scaleByHeight * randomScaleFactor));
 
         const scaledWidth = piece.width * trayScale;
         const scaledHeight = piece.height * trayScale;
@@ -1653,7 +1732,7 @@
         }
       }
 
-      const shuffled = shuffleArray(playPieces);
+      const shuffled = shufflePiecesForTray(playPieces);
       shuffled.forEach((piece, index) => {
         piece.trayOrder = index;
       });
@@ -1793,7 +1872,7 @@
       if (!currentImage) return;
 
       const freePieces = playPieces.filter((piece) => !piece.inBoard);
-      const shuffled = shuffleArray(freePieces);
+      const shuffled = shufflePiecesForTray(freePieces);
 
       shuffled.forEach((piece, index) => {
         piece.trayOrder = index;
